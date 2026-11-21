@@ -10,9 +10,22 @@ EXT = {c["id"]: c for c in json.loads((Path(__file__).resolve().parent.parent / 
 EXT2 = {c["id"]: c for c in json.loads((Path(__file__).resolve().parent.parent / "eval" / "test_set_ext2.json").read_text())["cases"]}
 
 
+def _later_sets():
+    """Every later form of the test that is present, in order: (cases by id, how far its ids are shifted)."""
+    out = [(EXT, 12), (EXT2, 24)]
+    for n, shift in ((3, 36), (4, 48)):
+        path = Path(__file__).resolve().parent.parent / "eval" / f"test_set_ext{n}.json"
+        if path.is_file():
+            out.append(({c["id"]: c for c in json.loads(path.read_text())["cases"]}, shift))
+    return out
+
+
 def test_extension_mirrors_the_first_set():
-    _mirrors(EXT, 12, set())
-    _mirrors(EXT2, 24, {(s["say"], s.get("image")) for c in EXT.values() for s in c["steps"] if "say" in s})
+    seen = set()
+    for cases, shift in _later_sets():
+        _mirrors(cases, shift, set(seen))
+        seen |= {(s["say"], s.get("image")) for c in cases.values() for s in c["steps"] if "say" in s}
+        assert len({c.get("set") for c in cases.values()}) == 1          # one set name per file
 
 
 def _mirrors(EXT, shift, also_seen):

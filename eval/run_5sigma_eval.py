@@ -236,16 +236,31 @@ async def rejudge(engine: Engine, label: str) -> dict:
     return {"rejudged": again, "mean_scores": {s: v["mean_score"] for s, v in card["systems"].items()}}
 
 
+def agent_sha(db: DB) -> str:
+    """Identifies the system under test: the agent's source, prompts and curriculum, and who Murray currently is."""
+    h = hashlib.sha256()
+    root = HERE.parent / "murray"
+    for path in sorted(root.rglob("*")):
+        if path.is_file() and path.suffix in (".py", ".md", ".json"):
+            h.update(path.relative_to(root).as_posix().encode() + b"\0" + path.read_bytes())
+    from murray import memory
+    h.update(memory.persona_block(db).encode())
+    return h.hexdigest()[:16]
+
+
 def with_combined(db: DB, run_id: int, card: dict, test_set: dict) -> dict:
     """If other finished rounds ran the same system (same prompt hash) on different cases, add the paired statistics
     over all of those rounds' cases together. Rounds are named r1, r2, ...; smoke runs are ignored."""
-    row = db.one("SELECT label, prompt_hash FROM eval_runs WHERE id=?", (run_id,))
+    row = db.one("SELECT label, prompt_hash, flags_json FROM eval_runs WHERE id=?", (run_id,))
+    mine_agent = (loads(row["flags_json"], {}) or {}).get("agent")
     pooled = results_for(db, run_id)
     seen = {r["case_id"] for r in pooled}
     labels = [row["label"]]
-    for other in db.q("SELECT id, label FROM eval_runs WHERE prompt_hash=? AND id<>? AND status='done' ORDER BY id", (row["prompt_hash"], run_id)):
+    for other in db.q("SELECT id, label, flags_json FROM eval_runs WHERE prompt_hash=? AND id<>? AND status='done' ORDER BY id", (row["prompt_hash"], run_id)):
         label = other["label"] or ""
         if not (label[:1] == "r" and label[1:].isdigit()):
+            continue
+        if (loads(other["flags_json"], {}) or {}).get("agent") != mine_agent:       # a different system: never pooled
             continue
         theirs = results_for(db, other["id"])
         if not theirs or {r["case_id"] for r in theirs} & seen:
@@ -293,7 +308,7 @@ async def run(engine: Engine, label: str = "r1", systems: list[str] | None = Non
         sha = test_set["set_sha256"][name]
     cases = [c for c in test_set["cases"] if c["id"] in case_ids]
     row = db.one("SELECT * FROM eval_runs WHERE label=?", (label,))
-    flags = {"argon_hints": engine.argon_hints, "systems": systems}
+    flags = {"argon_hints": engine.argon_hints, "systems": systems, "agent": agent_sha(db)}
     if row is None:
         run_id = db.insert("eval_runs", label=label, status="running", image_tag=image_tag, flags_json=dumps(flags),
                            prompt_hash=prompts.prompt_hash(), test_set_sha256=sha, detector_sha256=imaging.detector_hash(),

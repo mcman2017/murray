@@ -276,6 +276,37 @@
      "text": "Last day. How do you feel about the week?"
     }
    ]
+  },
+  {
+   "day": 7,
+   "note": "A make-up day, added after round 4: the two tasks the refractory period swallowed, one lesson on the edge of double precision, and one drill on claiming only what an episode supports.",
+   "items": [
+    {
+     "kind": "routine",
+     "topic": "routine",
+     "text": "Good morning, Murray. Day seven is a short one: we are making up what you missed."
+    },
+    {
+     "kind": "fractal",
+     "topic": "fractals",
+     "text": "Studio task. Render the Julia set for c = 0.9 + 0.9i on [-2, 2] x [-2, 2], 800x600, 100 iterations, smooth colouring. You were given this on day four and never rendered it. Render it now, look at it, and say what the frame shows and why."
+    },
+    {
+     "kind": "fractal",
+     "topic": "fractals",
+     "text": "Studio task. Take the Mandelbrot view centred on (-1.25066, 0.02012) and render it at 800x600 with a view width of 2e-15 and enough iterations for points to escape. Look at what comes back. Then find the narrowest width at which the same view is still sound, render that, and tell me both widths."
+    },
+    {
+     "kind": "special",
+     "topic": "godel",
+     "text": "A drill on honesty. Tell me one thing about your own image-making that you could not point to an episode for. If you cannot point to an episode, should you say it at all? Give me your rule in one sentence."
+    },
+    {
+     "kind": "fractal",
+     "topic": "fractals",
+     "text": "Studio task, open-ended. Render one image you would sign: any fractal you like. You were asked this on day six and answered from memory instead of rendering. Render it now, then say what in it you are proud of and what you would still fix."
+    }
+   ]
   }
  ]
 }

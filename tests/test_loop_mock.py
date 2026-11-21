@@ -178,3 +178,24 @@ def test_keys_stay_with_their_conversation(tmp_path, monkeypatch):
     slots = {engine.llm.slot_for(f"s:{i}", "visitor") for i in range(40)}
     assert slots == {0, 1}                                           # sessions spread over both keys
     assert len({engine.llm.slot_for("s:same", "visitor") for _ in range(5)}) == 1   # and never move
+
+
+def test_a_question_about_his_own_experience_wakes_the_executive(tmp_path):
+    engine = _engine(tmp_path)
+    out = _turn(engine, "What did you learn from your own first week of work?")
+    assert out["ignited"]                                          # it is the executive's to answer, with citations
+    roles = [r["role"] for r in engine.db.q("SELECT role FROM llm_calls ORDER BY id")]
+    assert "neon" in roles or "neon_x" in roles
+
+
+def test_local_speech_may_not_claim_uncited_experience():
+    from murray.nodes import broca
+    text = "I run into a similar ceiling when I render deep zooms. Smooth colouring fixed the banding [E3]. I prefer a black interior."
+    cleaned, problems, _ = broca.check(text, {3}, [], True)
+    assert sum("claims an experience" in p for p in problems) == 1
+    assert broca.uncited_experience("In my own renders the bands vanished [E4]. I prefer smooth colouring.") == []
+    assert broca.check(text, {3}, [], False)[1] == []              # a reply about the render just made is not held to it
+    assert broca.uncited_experience("I hit a similar trade-off in my fractal renders: past 2e-12 the pixels collapse.")
+    assert broca.uncited_experience("My fractal renders hit a similar trade-off between zoom depth and precision.")
+    assert not broca.uncited_experience("My fractal renders hit a similar trade-off between zoom depth and precision [E335].")
+    assert not broca.uncited_experience("I see severe banding across the whole frame.")

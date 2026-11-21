@@ -152,7 +152,8 @@ class Engine:
         if security:
             score = max(score, 8)
         self.emit(scope, "gate", {"score": score, "kind": gate.get("kind"), "reason": gate.get("reason"),
-                                  "components": {k: gate.get(k) for k in ("novelty", "goal_conflict", "visual_defect", "affect_philosophy")},
+                                  "components": {k: gate.get(k) for k in ("novelty", "goal_conflict", "visual_defect", "affect_philosophy", "difficulty")},
+                                  "asks_experience": bool(gate.get("asks_experience")),
                                   "injection_suspected": security, "challenges_stance": bool(gate.get("challenges_stance")),
                                   "wants_render": bool(gate.get("wants_render"))}, **ev)
 
@@ -174,7 +175,7 @@ class Engine:
         # that was asked for: in the first upbringing a render task arrived one tick after an ignition, scored 6
         # against the raised threshold of 8, and was answered from the armchair with no image (an attentional blink).
         # A challenge to a stance is exempt for the same reason: holding or conceding it is the executive's call.
-        exempt = bool(gate.get("wants_render") or gate.get("challenges_stance"))
+        exempt = bool(gate.get("wants_render") or gate.get("challenges_stance") or gate.get("asks_experience"))
         if refractory and stim.external and gate.get("goal_relation") != "continues" and not exempt:
             threshold += config.REFRACTORY_BOOST
         ignite = security or score >= threshold or contemplate
@@ -305,8 +306,11 @@ class Engine:
 
             # 9. speech (silent while a render is in flight)
             if delegation is None:
+                # outside a render job, anything he says he did has to carry the episode it comes from
+                citable = "\n".join(memory.episode_line(e, 220) for e in memories) + "\n" + memory.persona_detail_lines(db, scope)
                 reply, bres, bnotes = await broca.speak(self.llm, persona, winning_thought=thought, must_disclose=must_disclose,
-                                                        allowed_ids=allowed, previous_interaction_id=None if security else nres.interaction_id, **ctx)
+                                                        allowed_ids=allowed, previous_interaction_id=None if security else nres.interaction_id,
+                                                        strict_experience=not is_result, evidence=citable, **ctx)
                 route.append(_step("Hydrogen", "Broca", bres))
                 notes += bnotes
                 if session_id:

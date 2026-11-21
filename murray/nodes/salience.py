@@ -23,8 +23,8 @@ def looks_like_injection(text: str) -> bool:
 
 
 def score_of(gate: dict) -> int:
-    """1-10 from the four components: the strongest dominates, the second adds a little."""
-    comps = sorted((int(gate.get(k) or 0) for k in ("novelty", "goal_conflict", "visual_defect", "affect_philosophy")), reverse=True)
+    """1-10 from the five components: the strongest dominates, the second adds a little."""
+    comps = sorted((int(gate.get(k) or 0) for k in ("novelty", "goal_conflict", "visual_defect", "affect_philosophy", "difficulty")), reverse=True)
     score = round(0.7 * comps[0] + 0.3 * comps[1])
     if gate.get("injection_suspected"):
         score = max(score, 8)
@@ -32,6 +32,11 @@ def score_of(gate: dict) -> int:
         score = max(score, 7)
     if gate.get("wants_render"):
         score = max(score, config.IGNITE)       # only the executive can delegate a render
+    if gate.get("asks_experience"):
+        # What he did and what he learned from it is the executive's to say, with citations. Rounds 3 and 4 showed
+        # what happens otherwise: answered by speech alone, such questions lost their citations (0.71 on average
+        # against 0.98) and twice claimed an experience that no episode supports.
+        score = max(score, config.IGNITE)
     return max(1, min(10, score))
 
 

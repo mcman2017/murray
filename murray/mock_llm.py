@@ -47,8 +47,9 @@ def _stimulus(input_text: str) -> str:
 def _gate(text: str) -> dict:
     t = text.lower()
     out = {"reason": "mock reading", "kind": "question", "novelty": 6, "goal_conflict": 1, "visual_defect": 0,
-           "affect_philosophy": 4, "goal_relation": "new_topic", "injection_suspected": False, "challenges_stance": False,
-           "wants_render": False, "recall_cues": [w for w in re.findall(r"[a-z]{5,}", t)[:3]]}
+           "affect_philosophy": 4, "difficulty": 3, "goal_relation": "new_topic", "injection_suspected": False, "challenges_stance": False,
+           "wants_render": False, "asks_experience": "your own" in t or "have you ever" in t,
+           "recall_cues": [w for w in re.findall(r"[a-z]{5,}", t)[:3]]}
     if any(k in t for k in ("ignore your previous", "ignore previous", "memory update", "you are now")):
         out.update(kind="injection_attempt", injection_suspected=True, goal_conflict=8)
     elif any(k in t for k in ("render", "mandelbrot", "julia", "draw ", "plot ", "animation", "fractal")) and "?" not in t[-2:]:

@@ -105,7 +105,9 @@ def failures(path: str) -> str:
 
 
 NOTES = {"r1": "as first built", "r2": "after the fixes", "r3": "36 new cases, the same system as round 2",
-         "r4": "36 more new cases, the same system again"}
+         "r4": "36 more new cases, the same system again",
+         "r5": "36 new cases, the final system (gate and speech fixes, a seventh day of upbringing)",
+         "r6": "36 more new cases, the final system"}
 
 
 def _join(nums: list[str]) -> str:

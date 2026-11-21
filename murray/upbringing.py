@@ -30,7 +30,7 @@ def load_plan(mode: str) -> list[dict]:
     if mode == "quick":
         # one fractal task and one conversation per day: enough to exercise every model and six sleeps
         out = []
-        for d in days:
+        for d in days[:6]:                      # the quick seed is the six planned days; day 7 is the make-up day
             frac = next(i for i in d["items"] if i["kind"] == "fractal")
             talk = next(i for i in d["items"] if i["kind"] in ("special", "godel"))
             out.append({"day": d["day"], "items": [frac, talk]})

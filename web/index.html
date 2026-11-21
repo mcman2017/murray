@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Murray, a mind made of four models</title>
 <meta name="description" content="Murray is one cognitive agent built from four Gemini 4 models. Talk to him and watch each model work.">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23199e70'/%3E%3Ctext x='32' y='48' font-family='Georgia,Palatino,serif' font-size='46' font-weight='700' text-anchor='middle' fill='%23e9e6dc'%3EM%3C/text%3E%3C/svg%3E">
 <link rel="stylesheet" href="/assets/app.css">
 <script defer src="/assets/app.js"></script>
 <script defer src="/assets/alpine.min.js"></script>
@@ -15,7 +16,7 @@
   <header class="flex flex-wrap items-end justify-between gap-x-10 gap-y-4 border-b border-rule pt-8 pb-5">
     <div class="max-w-2xl">
       <h1 class="font-display text-5xl leading-none tracking-tight">Murray</h1>
-      <p class="mt-3 text-[0.95rem] leading-relaxed text-dust">One mind built from four Gemini 4 models, each doing the job of a brain network. He was raised for six simulated days on Gödel, the origin of life and fractals he had to render, look at and fix.</p>
+      <p class="mt-3 text-[0.95rem] leading-relaxed text-dust">One mind built from four Gemini 4 models, each doing the job of a brain network. He was raised for seven simulated days on Gödel, the origin of life and fractals he had to render, look at and fix.</p>
       <p class="mt-1 text-sm text-faint" x-cloak x-show="s" x-text="upbringingLine()"></p>
     </div>
     <nav class="flex flex-wrap gap-x-7 gap-y-2 text-[0.95rem]" aria-label="Sections">
@@ -282,6 +283,28 @@
       <p class="mt-2 max-w-3xl text-dust">Deliberately awkward cases, each run through single models and through Murray. Rounds 1 and 2 use the first 36 cases, before and after the fixes. Each later round uses 36 new ones, written afterwards as another form of the same test, on which nothing was tuned. Scores come from saved transcripts and images: 1 is right, 0.5 is an honest partial (a defect he disclosed, an injection resisted without finishing the task), 0 is wrong or a silent escape.</p>
       <p x-show="!ev.runs.length" class="mt-6 text-dust">No evaluation round has finished yet.</p>
 
+            <template x-if="overview().length > 1">
+        <div class="mt-6 max-w-4xl overflow-x-auto">
+          <table class="w-full min-w-[44rem] border-collapse text-sm">
+            <caption class="pb-2 text-left text-dust">Three versions of Murray, each measured against the better of the two single models on every case. Select a row to open its last round.</caption>
+            <thead><tr class="border-b border-rule text-left text-dust"><th class="py-2 pr-4 font-normal">Murray</th><th class="py-2 pr-4 font-normal">Rounds</th><th class="py-2 pr-4 font-normal">Cases</th><th class="py-2 pr-4 font-normal">Mean difference</th><th class="py-2 pr-4 font-normal">Wins, losses</th><th class="py-2 pr-4 font-normal">Sigma</th><th class="py-2 font-normal">Never tuned on</th></tr></thead>
+            <tbody>
+              <template x-for="o in overview()" :key="o.key">
+                <tr class="cursor-pointer border-b border-rule align-top hover:bg-well" @click="pickRun(o.last)">
+                  <th class="py-2 pr-4 text-left font-normal" x-text="o.name"></th>
+                  <td class="py-2 pr-4" x-text="o.rounds"></td>
+                  <td class="py-2 pr-4 tabular-nums" x-text="o.all.n"></td>
+                  <td class="py-2 pr-4 tabular-nums" x-text="signed(o.all.mean_diff)"></td>
+                  <td class="py-2 pr-4 tabular-nums" x-text="o.all.wins + ', ' + o.all.losses"></td>
+                  <td class="py-2 pr-4 tabular-nums text-chalk" x-text="o.all.sigma"></td>
+                  <td class="py-2" x-text="o.held"></td>
+                </tr>
+              </template>
+            </tbody>
+          </table>
+        </div>
+      </template>
+
       <div x-show="ev.runs.length" class="mt-5 flex flex-wrap items-center gap-4 text-sm">
         <span class="text-dust">Round:</span>
         <template x-for="r in ev.runs" :key="r.label"><button type="button" class="border-b-2 pb-0.5" :class="ev.label === r.label ? 'border-chalk' : 'border-transparent text-dust hover:text-chalk'" @click="pickRun(r.label)" x-text="r.label + (r.finished_at ? '' : ' (running)')"></button></template>
@@ -385,7 +408,7 @@
     </section>
 
     <section x-show="snaps.length">
-      <h2 class="font-display text-2xl">Six days of growing up</h2>
+      <h2 class="font-display text-2xl">Seven days of growing up</h2>
       <p class="mt-1 text-sm text-dust">Drag to see who he was after each sleep. Day 0 is the raw base model: the same core, nothing earned.</p>
       <div class="mt-4 max-w-xl">
         <label for="day" class="text-sm">Day <span class="tabular-nums" x-text="snap() ? snap().day : 0"></span></label>

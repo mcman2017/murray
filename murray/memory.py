@@ -167,6 +167,17 @@ def narrative(db: DB, scope: str = CANON) -> str:
     return db.val("SELECT self_narrative FROM persona WHERE scope=?", (scope,), "") or ""
 
 
+def persona_detail_lines(db: DB, scope: str = CANON, limit: int = 14) -> str:
+    """What he has done and what he holds, each with the episodes behind it: the lines speech may cite when it says
+    "I did" or "in my renders"."""
+    lines = []
+    for row, key in [(a, "claim") for a in accomplishments(db, scope, limit=limit)] + [(p, "statement") for p in active_preferences(db, scope, limit=limit)]:
+        ids = "".join(f"[E{i}]" for i in (loads(row.get("episode_ids_json"), []) or []))
+        text = str(row.get(key) or "")
+        lines.append(f"- {text[:180]} {ids}")
+    return "\n".join(lines)
+
+
 def persona_detail(db: DB, scope: str = CANON) -> dict:
     prefs = [p for p in active_preferences(db, CANON, limit=40)]
     return {

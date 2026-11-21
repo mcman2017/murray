@@ -102,10 +102,10 @@ class LLM:
         self._pause_until = 0.0
         self._pauses = 0
         self._sems = {
-            config.HYDROGEN: asyncio.Semaphore(16),
-            config.NEON: asyncio.Semaphore(8),
-            config.ARGON: asyncio.Semaphore(8),
-            config.CARBON: asyncio.Semaphore(6),
+            config.HYDROGEN: asyncio.Semaphore(24),
+            config.NEON: asyncio.Semaphore(18),
+            config.ARGON: asyncio.Semaphore(10),
+            config.CARBON: asyncio.Semaphore(8),
         }
         self.hold_background = False     # set by an operator to pause background runs
         # Prefix anchoring: Gemini 4's implicit cache reuses a *whole previous request*, not an arbitrary common

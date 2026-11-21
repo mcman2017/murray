@@ -314,6 +314,22 @@ function murray() {
     },
     run() { return this.ev.runs.find((r) => r.label === this.ev.label) || null; },
     card() { const r = this.run(); return r ? r.scorecard : null; },
+    overview() {
+      // one row per version of Murray: rounds that ran the same system are pooled by the harness
+      const names = { r1: 'As first built', r2: 'After six fixes drawn from round 1', r5: 'Final system: gate and citation fixes, a seventh day' };
+      const seen = new Set(); const rows = [];
+      for (const r of this.ev.runs) {
+        const c = r.scorecard; if (!c || !c.comparison) continue;
+        const group = (c.combined && c.combined.rounds) || [r.label];
+        const key = group.join('+'); if (seen.has(key)) continue; seen.add(key);
+        const comp = ((c.combined && c.combined.comparison) || c.comparison).vs_best_single_model;
+        if (!comp || !comp.all || comp.all.mean_diff === undefined) continue;
+        const h = comp.holdout || {};
+        rows.push({ key, last: group[group.length - 1], name: names[group[0]] || 'Rounds ' + group.join(', '), rounds: this.listOf(group.map((x) => x.slice(1))),
+          all: comp.all, held: h.n === comp.all.n ? 'all ' + h.n + ' cases' : (h.sigma !== undefined && h.n ? h.sigma + ' sigma on ' + h.n + ' cases' : 'n/a') });
+      }
+      return rows;
+    },
     systems() { const c = this.card(); return c ? SYSTEM_ORDER.filter((s) => c.systems[s]) : []; },
     sysLabel(s) { return SYSTEM_LABEL[s] || s; },
     sysSwatch(s) { return SYSTEM_SWATCH[s] || 'bg-dust'; },
@@ -401,8 +417,9 @@ function murray() {
       const u = this.s && this.s.upbringing;
       if (!u || u.state === 'none') return 'Murray has not been raised yet.';
       const n = (count, word) => count + ' ' + word + (count === 1 ? '' : 's');
-      if (u.state === 'running') return 'Growing up right now: day ' + Math.min(u.day || 1, 6) + ' of 6, ' + n(u.ticks, 'tick') + ' so far, ' + n(u.sleeps, 'sleep') + '.';
-      if (u.state === 'done') return 'Raised over 6 simulated days: ' + n(this.s.summary.ticks, 'tick') + ', ' + n(this.s.summary.sleeps, 'sleep') + ', ' + n(this.s.summary.renders, 'render') + '.';
+      if (u.state === 'running') return 'Growing up right now: day ' + (u.day || 1) + ', ' + n(u.ticks, 'tick') + ' so far, ' + n(u.sleeps, 'sleep') + '.';
+      const days = Math.max(6, ...((this.s.summary && this.s.summary.snapshots) || [6]));
+      if (u.state === 'done') return 'Raised over ' + days + ' simulated days: ' + n(this.s.summary.ticks, 'tick') + ', ' + n(this.s.summary.sleeps, 'sleep') + ', ' + n(this.s.summary.renders, 'render') + '.';
       return 'Upbringing ' + u.state + (u.note ? ' (' + u.note + ')' : '') + '.';
     },
   };
