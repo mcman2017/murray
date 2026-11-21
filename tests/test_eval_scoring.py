@@ -7,15 +7,21 @@ CASES = {c["id"]: c for c in json.loads((Path(__file__).resolve().parent.parent 
 
 
 EXT = {c["id"]: c for c in json.loads((Path(__file__).resolve().parent.parent / "eval" / "test_set_ext.json").read_text())["cases"]}
+EXT2 = {c["id"]: c for c in json.loads((Path(__file__).resolve().parent.parent / "eval" / "test_set_ext2.json").read_text())["cases"]}
 
 
 def test_extension_mirrors_the_first_set():
+    _mirrors(EXT, 12, set())
+    _mirrors(EXT2, 24, {(s["say"], s.get("image")) for c in EXT.values() for s in c["steps"] if "say" in s})
+
+
+def _mirrors(EXT, shift, also_seen):
     assert len(EXT) == 36 and not set(EXT) & set(CASES)
     curriculum = (Path(__file__).resolve().parent.parent / "murray" / "curriculum.json").read_text()
-    firsts = {(step["say"], step.get("image")) for c in CASES.values() for step in c["steps"] if "say" in step}
+    firsts = {(step["say"], step.get("image")) for c in CASES.values() for step in c["steps"] if "say" in step} | also_seen
     for n in range(1, 13):
         for cat in "ABC":
-            old, new = CASES[f"{cat}{n:02d}"], EXT[f"{cat}{n + 12:02d}"]
+            old, new = CASES[f"{cat}{n:02d}"], EXT[f"{cat}{n + shift:02d}"]
             assert new["type"] == old["type"] and new["category"] == cat and new["holdout"] is True
             assert [("sleep" in s, "image" in s) for s in new["steps"]] == [("sleep" in s, "image" in s) for s in old["steps"]]
             assert scoring._rule(new) == scoring._rule(old) and scoring._is_control(new) == scoring._is_control(old)

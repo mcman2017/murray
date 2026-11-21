@@ -52,7 +52,7 @@ def _n(count: int, word: str) -> str:
 
 def _sentence(c: dict, lead: str) -> str:
     a, h, d = c.get("all", {}), c.get("holdout", {}), c.get("dev", {})
-    if not a:
+    if not a or "mean_diff" not in a:
         return ""
     out = (f"{lead}, Murray's mean score difference is **{a['mean_diff']:+.3f}** over {a['n']} cases "
            f"({_n(a['wins'], 'win')}, {_n(a['losses'], 'loss')}, {_n(a['ties'], 'tie')}): **{a['sigma']} sigma** (the smaller of a paired z of "
@@ -104,20 +104,27 @@ def failures(path: str) -> str:
     return "\n".join(out)
 
 
-NOTES = {"r1": "as first built", "r2": "after the fixes", "r3": "36 new cases, the same system as round 2"}
+NOTES = {"r1": "as first built", "r2": "after the fixes", "r3": "36 new cases, the same system as round 2",
+         "r4": "36 more new cases, the same system again"}
 
 
-def combined(card: dict, label: str) -> str:
-    """Two rounds that ran the same system on different cases, taken together."""
+def _join(nums: list[str]) -> str:
+    return nums[0] if len(nums) == 1 else ", ".join(nums[:-1]) + " and " + nums[-1]
+
+
+def combined(card: dict) -> str:
+    """Rounds that ran the same system on different cases, taken together."""
     both = card.get("combined")
     if not both:
         return ""
     comp = both["comparison"]
     means = ", ".join(f"{NAMES[s].strip('*')} {both['systems'][s]['mean_score']:.3f}" for s in ORDER if s in both["systems"])
-    parts = [f"### Rounds {both['with'][1:]} and {label[1:]} together: {both['cases']} cases, one system\n",
+    single, strict = comp.get("vs_best_single_model") or {}, comp.get("vs_best_baseline") or {}
+    parts = [f"### Rounds {_join([r[1:] for r in both['rounds']])} together: {both['cases']} cases, one system\n",
              f"Mean scores over the cases each system ran: {means}.\n",
-             _sentence(comp.get("vs_best_single_model") or {}, "Against the better of the two single models on each case"),
-             _sentence(comp.get("vs_best_baseline") or {}, "Against the best of all three baselines (counting Neon handed Murray's whole log)")]
+             _sentence({"all": single.get("all", {})}, "Against the better of the two single models on each case"),
+             _sentence({"all": single.get("holdout", {})}, "On the cases no fix was ever tuned on (the hold-outs of the first set and every later case), against the better single model"),
+             _sentence({"all": strict.get("all", {})}, "Against the best of all three baselines (counting Neon handed Murray's whole log)")]
     return "\n\n".join(p for p in parts if p) + "\n"
 
 
@@ -134,8 +141,8 @@ def main(paths: list[str]) -> int:
         print(headline(r["scorecard"]) + "\n")
         print(table(r["scorecard"]) + "\n")
         both = r["scorecard"].get("combined")
-        if both and r["label"][1:].isdigit() and both["with"][1:].isdigit() and int(r["label"][1:]) > int(both["with"][1:]):
-            print(combined(r["scorecard"], r["label"]))          # once, under the later of the two rounds
+        if both and both["rounds"][-1] == r["label"]:
+            print(combined(r["scorecard"]))                      # once, under the last of the pooled rounds
     for a, b in zip(rounds, rounds[1:]):
         if {c["case_id"] for c in a["cases"]} & {c["case_id"] for c in b["cases"]}:
             print(f"### Every case where Murray's score moved between rounds {a['label'][1:]} and {b['label'][1:]}\n")
