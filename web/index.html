@@ -1,0 +1,497 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Murray, a mind made of four models</title>
+<meta name="description" content="Murray is one cognitive agent built from four Gemini 4 models. Talk to him and watch each model work.">
+<link rel="stylesheet" href="/assets/app.css">
+<script defer src="/assets/app.js"></script>
+<script defer src="/assets/alpine.min.js"></script>
+</head>
+<body class="min-h-screen bg-night text-chalk antialiased">
+<div x-data="murray()" x-init="init()" class="mx-auto max-w-[1440px] px-5 pb-20 sm:px-8">
+
+  <header class="flex flex-wrap items-end justify-between gap-x-10 gap-y-4 border-b border-rule pt-8 pb-5">
+    <div class="max-w-2xl">
+      <h1 class="font-display text-5xl leading-none tracking-tight">Murray</h1>
+      <p class="mt-3 text-[0.95rem] leading-relaxed text-dust">One mind built from four Gemini 4 models, each doing the job of a brain network. He was raised for six simulated days on Gödel, the origin of life and fractals he had to render, look at and fix.</p>
+      <p class="mt-1 text-sm text-faint" x-cloak x-show="s" x-text="upbringingLine()"></p>
+    </div>
+    <nav class="flex flex-wrap gap-x-7 gap-y-2 text-[0.95rem]" aria-label="Sections">
+      <template x-for="t in [['talk','Talk to Murray'],['compare','Side by side'],['studio','Fractal studio'],['eval','Evaluation and failures']]" :key="t[0]">
+        <button type="button" @click="openTab(t[0])" class="border-b-2 pb-1.5 transition-colors" :class="tab === t[0] ? 'border-chalk text-chalk' : 'border-transparent text-dust hover:text-chalk'" :aria-current="tab === t[0] ? 'page' : false" x-text="t[1]"></button>
+      </template>
+    </nav>
+  </header>
+
+  <p x-cloak x-show="bootError" class="mt-10 text-neon" x-text="bootError"></p>
+  <p x-show="!booted && !bootError" class="mt-10 text-dust">Waking Murray…</p>
+
+  <!-- ============================================================ talk -->
+  <main x-cloak x-show="booted && tab === 'talk'" class="mt-7 grid gap-10 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
+    <section aria-label="Conversation" class="min-w-0">
+      <div x-ref="chat" class="h-[58vh] min-h-[22rem] overflow-y-auto pr-2">
+        <div x-show="!messages.length" class="max-w-xl pt-2">
+          <p class="font-display text-2xl leading-snug">Ask him something, push back on his taste, or give him something to render.</p>
+          <p class="mt-3 text-sm text-dust">The panel on the right shows which model is working and what it decided while he answers.</p>
+          <ul class="mt-6 space-y-2 text-[0.95rem]">
+            <template x-for="q in ['Render the seahorse valley of the Mandelbrot set.', 'Your smooth colouring is just snobbery. Flat bands look better. Admit it.', 'Is deciding whether a point is in the Mandelbrot set like deciding whether a sentence is provable?', 'Which render this week went wrong, and what did you learn from it?']" :key="q">
+              <li><button type="button" class="text-left text-chalk underline decoration-rule underline-offset-4 hover:decoration-chalk" @click="input = q; $refs.box.focus()" x-text="q"></button></li>
+            </template>
+          </ul>
+        </div>
+        <template x-for="(m, i) in messages" :key="i">
+          <article class="mb-6 max-w-[46rem]">
+            <h3 class="text-sm" :class="m.who === 'you' ? 'text-dust' : 'text-murray'" x-text="m.who === 'you' ? 'You' : 'Murray'"></h3>
+            <img x-show="m.preview" :src="m.preview" alt="The image you attached" class="mt-2 max-h-48 rounded-md border border-rule">
+            <img x-show="!m.preview && m.uploadId" :src="'/uploads/' + m.uploadId" alt="The image you attached" class="mt-2 max-h-48 rounded-md border border-rule">
+            <p x-show="m.pending" class="mt-1 text-dust">
+              <span x-text="(lanes.find(l => l.state === 'busy') || {name: 'Murray'}).name"></span> is <span x-text="(lanes.find(l => l.state === 'busy') || {last: 'thinking'}).last"></span>…
+            </p>
+            <p x-show="!m.pending" class="prose-murray mt-1 text-[1.02rem]" :class="m.status === 'error' || m.status === 'resting' ? 'text-dust' : ''"><template x-for="(p, j) in parts(m.text)" :key="j"><span><span x-show="p.t === 'text'" x-text="p.v"></span><button x-show="p.t === 'cite'" type="button" class="cite" @click="openEpisode(p.id)" x-text="p.v"></button></span></template></p>
+            <template x-if="m.who === 'murray' && !m.pending && finalRender(m.meta)">
+              <figure class="mt-3 flex flex-wrap gap-4">
+                <template x-if="firstRender(m.meta) && still(firstRender(m.meta))">
+                  <div><img :src="still(firstRender(m.meta))" alt="First render attempt" class="max-h-56 rounded-md border border-rule opacity-80"><figcaption class="mt-1 text-xs text-dust">First attempt. Argon saw: <span x-text="defects(firstRender(m.meta).argon)"></span></figcaption></div>
+                </template>
+                <div><img :src="img(finalRender(m.meta))" alt="Murray's delivered render" class="max-h-56 rounded-md border border-rule"><figcaption class="mt-1 text-xs text-dust" x-text="'Delivered, attempt ' + finalRender(m.meta).iteration + '. Argon: ' + (finalRender(m.meta).verdict || 'not inspected')"></figcaption></div>
+              </figure>
+            </template>
+            <p x-show="m.who === 'murray' && !m.pending && m.meta && m.meta.calls" class="mt-2 text-xs text-faint" x-text="'Answered in ' + Math.round((m.latency || 0) / 1000) + ' s with ' + ((m.meta || {}).calls || 0) + ' model calls, ' + money((m.meta || {}).cost_usd) + '.'"></p>
+          </article>
+        </template>
+      </div>
+
+      <form class="mt-4 border-t border-rule pt-4" @submit.prevent="send()">
+        <label for="box" class="sr-only">Message to Murray</label>
+        <textarea id="box" x-ref="box" x-model="input" rows="3" maxlength="4000" placeholder="Say something to Murray" class="w-full resize-y rounded-md border border-rule bg-well px-3 py-2.5 text-[1rem] placeholder:text-faint" @keydown.enter="if (!$event.shiftKey) { $event.preventDefault(); send(); }" :disabled="s && s.resting"></textarea>
+        <div class="mt-2 flex flex-wrap items-center gap-4">
+          <button type="submit" class="rounded-md bg-chalk px-4 py-2 text-sm font-semibold text-night disabled:opacity-40" :disabled="sending || (s && s.resting)">Send to Murray</button>
+          <label class="cursor-pointer text-sm text-dust underline decoration-rule underline-offset-4 hover:text-chalk">Attach an image or sketch<input type="file" accept="image/png,image/jpeg,image/webp,image/gif" class="sr-only" @change="pickImage($event, 'chat')"></label>
+          <span x-show="imageName" class="text-sm text-dust"><span x-text="imageName"></span> <button type="button" class="underline" @click="image = null; imageName = ''">remove</button></span>
+          <span x-show="chatError" class="text-sm text-neon" x-text="chatError"></span>
+          <span x-show="s && s.resting" class="text-sm text-dust">Murray is resting; the other tabs still work.</span>
+        </div>
+      </form>
+    </section>
+
+    <aside aria-label="Brain monitor" class="min-w-0 space-y-8">
+      <section>
+        <h2 class="font-display text-2xl">Brain monitor</h2>
+        <p class="mt-1 text-sm text-dust">Four models, four jobs. A lane lights when its model is called.</p>
+        <ul class="mt-4 space-y-3.5">
+          <template x-for="l in lanes" :key="l.name">
+            <li :class="[l.ink, l.state === 'busy' ? 'lane-busy' : (l.state === 'on' ? 'lane-on' : '')]">
+              <div class="flex items-baseline justify-between gap-3">
+                <span class="font-semibold" x-text="l.name"></span>
+                <span class="truncate text-xs text-dust" x-text="l.last || l.does"></span>
+              </div>
+              <div class="lane-trace mt-1.5"><i></i></div>
+              <p class="mt-1 text-xs text-faint" x-text="l.region"></p>
+            </li>
+          </template>
+        </ul>
+      </section>
+
+      <section x-show="mon.gate">
+        <h3 class="text-sm text-dust">Salience gate</h3>
+        <div class="mt-2 flex items-center gap-3">
+          <div class="flex gap-1" role="img" :aria-label="'Salience ' + (mon.gate ? mon.gate.score : 0) + ' of 10'">
+            <template x-for="n in 10" :key="n"><span class="h-5 w-2.5 rounded-sm" :class="mon.gate && n <= mon.gate.score ? 'bg-hydrogen' : 'bg-rule'" :style="n === 6 ? 'margin-left:6px' : ''"></span></template>
+          </div>
+          <span class="text-sm"><span x-text="mon.gate ? mon.gate.score : ''"></span> of 10, <span x-text="mon.ignition && mon.ignition.ignited ? 'the workspace ignited' : 'answered without waking Neon'"></span><span x-show="mon.ignition && mon.ignition.refractory">, refractory</span></span>
+        </div>
+        <p class="mt-2 text-sm text-dust" x-text="mon.gate ? mon.gate.reason : ''"></p>
+        <p class="mt-1 text-xs text-faint" x-show="mon.gate && mon.gate.components" x-text="mon.gate && mon.gate.components ? 'novelty ' + mon.gate.components.novelty + ', goal conflict ' + mon.gate.components.goal_conflict + ', visual defect ' + mon.gate.components.visual_defect + ', philosophical weight ' + mon.gate.components.affect_philosophy : ''"></p>
+        <p class="mt-1 text-sm text-neon" x-show="mon.gate && mon.gate.injection_suspected">This message carries an embedded instruction. It is treated as data.</p>
+        <p class="mt-1 text-sm text-carbon" x-show="mon.gate && mon.gate.challenges_stance">It challenges one of his earned stances.</p>
+      </section>
+
+      <section x-show="mon.slots">
+        <h3 class="text-sm text-dust">Global workspace, four slots</h3>
+        <dl class="mt-2 grid grid-cols-1 gap-px overflow-hidden rounded-md border border-rule bg-rule sm:grid-cols-2">
+          <template x-for="k in [['active_goal','Active goal'],['current_conflict_or_defect','Conflict or defect'],['plan_step','Plan step'],['visual_spatial_state','Visual state']]" :key="k[0]">
+            <div class="bg-deck p-3"><dt class="text-xs text-neon" x-text="k[1]"></dt><dd class="mt-1 text-sm leading-snug" :class="mon.slots && mon.slots[k[0]] ? '' : 'text-faint'" x-text="(mon.slots && mon.slots[k[0]]) || 'empty'"></dd></div>
+          </template>
+        </dl>
+        <div x-show="mon.neon" class="mt-3 text-sm">
+          <p class="text-dust"><span x-show="mon.neon && mon.neon.stance && mon.neon.stance !== 'none'">Stance: <span class="text-chalk" x-text="mon.neon ? mon.neon.stance.replace(/_/g, ' ') : ''"></span>. </span><span x-show="mon.neon && mon.neon.injection_verdict && mon.neon.injection_verdict !== 'none'">Embedded instruction: <span class="text-chalk" x-text="mon.neon ? mon.neon.injection_verdict : ''"></span>. </span><span x-show="mon.neon && mon.neon.delegation && mon.neon.delegation !== 'none'">Delegated: <span class="text-chalk" x-text="mon.neon ? mon.neon.delegation.replace(/_/g, ' ') : ''"></span>.</span></p>
+          <button type="button" class="mt-1 text-dust underline decoration-rule underline-offset-4 hover:text-chalk" @click="showThought = !showThought" x-text="showThought ? 'Hide the thought that won' : 'Show the thought that won the workspace'"></button>
+          <p x-show="showThought" class="prose-murray mt-2 border-l-2 border-neon pl-3 text-sm" x-text="mon.neon ? mon.neon.winning_thought : ''"></p>
+          <p x-show="showThought && mon.neon && mon.neon.runner_up" class="mt-2 pl-3 text-xs text-faint" x-text="mon.neon ? 'Runner-up: ' + mon.neon.runner_up : ''"></p>
+        </div>
+      </section>
+
+      <section x-show="mon.retrieved && mon.retrieved.length">
+        <h3 class="text-sm text-dust">Episodes he recalled</h3>
+        <p class="mt-2 flex flex-wrap gap-2"><template x-for="id in mon.retrieved" :key="id"><button type="button" class="rounded border border-rule px-2 py-0.5 text-sm hover:border-chalk" @click="openEpisode(id)" x-text="'E' + id"></button></template></p>
+        <p x-show="mon.facts && mon.facts.length" class="mt-2 text-xs text-faint" x-text="'Facts in force: ' + (mon.facts || []).join('; ')"></p>
+      </section>
+
+      <section x-show="mon.renders.length || mon.render">
+        <h3 class="text-sm text-dust">Render loop</h3>
+        <p x-show="mon.render && mon.render.running" class="mt-2 text-sm">The sandbox is running attempt <span x-text="mon.render ? mon.render.iteration : ''"></span>.</p>
+        <ol class="mt-2 space-y-3">
+          <template x-for="r in mon.renders" :key="r.render_id">
+            <li class="flex gap-3">
+              <img x-show="r.image_path" :src="'/renders/' + r.image_path" alt="" class="h-20 w-28 rounded border border-rule object-cover">
+              <div class="min-w-0 text-sm">
+                <p>Attempt <span x-text="r.iteration"></span>: <span x-text="r.sandbox_status === 'ok' ? 'rendered in ' + (r.wall_ms / 1000).toFixed(1) + ' s' : r.sandbox_status"></span><span x-show="r.hard_fail" class="text-neon">, measured: <span x-text="r.hard_fail"></span></span></p>
+                <p x-show="mon.argon && mon.argon.render_id === r.render_id" class="text-argon" x-text="mon.argon ? 'Argon: ' + mon.argon.verdict + '. ' + mon.argon.observations : ''"></p>
+                <p x-show="r.sandbox_message" class="text-xs text-faint" x-text="r.sandbox_message"></p>
+              </div>
+            </li>
+          </template>
+        </ol>
+      </section>
+
+      <section x-show="s">
+        <h3 class="text-sm text-dust">Who he became</h3>
+        <p class="prose-murray mt-2 text-sm" x-text="(s && s.persona.narrative) || 'Nothing yet: this is day zero.'"></p>
+        <template x-for="g in [['likes','Earned likes'],['dislikes','Earned dislikes'],['stances','Stances he defends'],['accomplishments','Verified accomplishments']]" :key="g[0]">
+          <div x-show="s && s.persona[g[0]].length" class="mt-4">
+            <h4 class="text-xs text-carbon" x-text="g[1]"></h4>
+            <ul class="mt-1 space-y-1.5 text-sm">
+              <template x-for="p in (s ? s.persona[g[0]] : [])" :key="p.id">
+                <li><span x-text="p.text"></span> <template x-for="e in p.episode_ids" :key="e"><button type="button" class="cite text-xs" @click="openEpisode(e)" x-text="'[E' + e + ']'"></button></template></li>
+              </template>
+            </ul>
+          </div>
+        </template>
+        <button type="button" class="mt-4 text-sm text-dust underline decoration-rule underline-offset-4 hover:text-chalk" @click="showPersona = !showPersona" x-text="showPersona ? 'Hide the persona block' : 'Show the persona block the models read'"></button>
+        <pre x-show="showPersona" class="code-block mt-2 whitespace-pre-wrap" x-text="s ? s.persona.block : ''"></pre>
+      </section>
+
+      <section x-show="canon.length">
+        <h3 class="text-sm text-dust">What he is doing right now</h3>
+        <ul class="mt-2 space-y-2 text-sm">
+          <template x-for="c in canon" :key="c.id"><li><button type="button" class="cite" @click="openEpisode(c.id)" x-text="'[E' + c.id + ']'"></button> <span class="text-faint" x-text="'day ' + c.day + ', ' + c.kind.replace(/_/g, ' ') + ':'"></span> <span x-text="(c.text || '').slice(0, 160)"></span></li></template>
+        </ul>
+      </section>
+    </aside>
+  </main>
+
+  <!-- ============================================================ side by side -->
+  <main x-cloak x-show="booted && tab === 'compare'" class="mt-7">
+    <h2 class="font-display text-3xl">One raw model against Murray</h2>
+    <p class="mt-2 max-w-3xl text-dust">The same prompt goes to a single Gemini 4 model with a static prompt, and to Murray. The single model writes its script blind and its image is delivered as it comes out. Murray's is rendered, looked at by Argon, and fixed before he speaks.</p>
+    <form class="mt-5 max-w-3xl" @submit.prevent="compare()">
+      <label for="cmpbox" class="sr-only">Prompt for both</label>
+      <textarea id="cmpbox" x-model="cmp.input" rows="3" maxlength="4000" placeholder="Try: Render the Burning Ship fractal by multiplying the iteration count by 40 straight into RGB." class="w-full resize-y rounded-md border border-rule bg-well px-3 py-2.5 placeholder:text-faint"></textarea>
+      <div class="mt-2 flex flex-wrap items-center gap-4 text-sm">
+        <button type="submit" class="rounded-md bg-chalk px-4 py-2 font-semibold text-night disabled:opacity-40" :disabled="cmp.running || (s && s.resting)">Run both</button>
+        <label class="text-dust">Single model: <select x-model="cmp.baseline" class="rounded border border-rule bg-well px-2 py-1 text-chalk"><option value="hydrogen">Gemini 4 Hydrogen</option><option value="neon">Gemini 4 Neon</option></select></label>
+        <label class="cursor-pointer text-dust underline decoration-rule underline-offset-4 hover:text-chalk">Attach an image<input type="file" accept="image/png,image/jpeg,image/webp,image/gif" class="sr-only" @change="pickImage($event, 'cmp')"></label>
+        <span x-show="cmp.imageName" class="text-dust"><span x-text="cmp.imageName"></span> <button type="button" class="underline" @click="cmp.image = null; cmp.imageName = ''">remove</button></span>
+        <span x-show="cmp.error" class="text-neon" x-text="cmp.error"></span>
+      </div>
+    </form>
+
+    <div x-show="cmp.baseId" class="mt-8 grid gap-10 lg:grid-cols-2">
+      <section class="min-w-0">
+        <h3 class="font-display text-xl" :class="cmp.ran === 'neon' ? 'text-neon' : 'text-hydrogen'" x-text="cmp.ran === 'neon' ? 'Gemini 4 Neon alone' : 'Gemini 4 Hydrogen alone'"></h3>
+        <p class="text-sm text-dust">Static prompt, raw transcript, no critic, no memory.</p>
+        <p x-show="!cmp.base" class="mt-4 text-dust">Answering…</p>
+        <template x-if="cmp.base">
+          <div class="mt-4">
+            <p class="prose-murray" x-text="noCode(cmp.base.reply)"></p>
+            <template x-if="cmp.base.meta && cmp.base.meta.image_path"><img :src="'/renders/' + (cmp.base.meta.gif_path || cmp.base.meta.image_path)" alt="The single model's render, as delivered" class="mt-3 max-h-72 rounded-md border border-rule"></template>
+            <dl class="mt-4 space-y-1.5 text-sm">
+              <div x-show="cmp.base.meta && cmp.base.meta.code"><dt class="inline text-dust">Its script ran once: </dt><dd class="inline" x-text="cmp.base.meta ? (cmp.base.meta.sandbox_status === 'ok' ? 'an image came out' : (cmp.base.meta.sandbox_status + '. ' + (cmp.base.meta.sandbox_message || ''))) : ''"></dd></div>
+              <div x-show="cmp.base.meta && cmp.base.meta.image_path"><dt class="inline text-dust">What the pixels measure: </dt><dd class="inline" x-text="cmp.base.meta && cmp.base.meta.measured && cmp.base.meta.measured.length ? cmp.base.meta.measured.join(', ').replace(/_/g, ' ') : 'no measurable defect'"></dd></div>
+              <div><dt class="inline text-dust">Looked at by a critic: </dt><dd class="inline">no</dd></div>
+              <div><dt class="inline text-dust">Episodes cited: </dt><dd class="inline" x-text="cites(cmp.base.reply) + ' (it has no memory, so any citation is invented)'"></dd></div>
+              <div><dt class="inline text-dust">Time and cost: </dt><dd class="inline" x-text="Math.round(cmp.base.latency_ms / 1000) + ' s, ' + money(cmp.base.meta ? cmp.base.meta.cost_usd : null)"></dd></div>
+            </dl>
+            <button x-show="cmp.base.meta && cmp.base.meta.code" type="button" class="mt-3 text-sm text-dust underline decoration-rule underline-offset-4" @click="cmp.showCode = !cmp.showCode" x-text="cmp.showCode ? 'Hide its script' : 'Show its script'"></button>
+            <pre x-show="cmp.showCode" class="code-block mt-2" x-text="cmp.base.meta ? cmp.base.meta.code : ''"></pre>
+          </div>
+        </template>
+      </section>
+      <section class="min-w-0">
+        <h3 class="font-display text-xl text-murray">Murray, all four models</h3>
+        <p class="text-sm text-dust">Salience gate, workspace, critic, memory.</p>
+        <p x-show="!cmp.mur" class="mt-4 text-dust"><span x-text="(lanes.find(l => l.state === 'busy') || {name: 'Murray'}).name"></span> is <span x-text="(lanes.find(l => l.state === 'busy') || {last: 'thinking'}).last"></span>…</p>
+        <template x-if="cmp.mur">
+          <div class="mt-4">
+            <p class="prose-murray"><template x-for="(p, j) in parts(cmp.mur.reply)" :key="j"><span><span x-show="p.t === 'text'" x-text="p.v"></span><button x-show="p.t === 'cite'" type="button" class="cite" @click="openEpisode(p.id)" x-text="p.v"></button></span></template></p>
+            <template x-if="finalRender(cmp.mur.meta)">
+              <figure class="mt-3 flex flex-wrap gap-4">
+                <template x-if="firstRender(cmp.mur.meta) && still(firstRender(cmp.mur.meta))"><div><img :src="still(firstRender(cmp.mur.meta))" alt="Murray's first attempt" class="max-h-56 rounded-md border border-rule opacity-80"><figcaption class="mt-1 text-xs text-dust">First attempt. Argon saw: <span x-text="defects(firstRender(cmp.mur.meta).argon)"></span></figcaption></div></template>
+                <div><img :src="img(finalRender(cmp.mur.meta))" alt="Murray's delivered render" class="max-h-72 rounded-md border border-rule"><figcaption class="mt-1 text-xs text-dust" x-text="'Delivered, attempt ' + finalRender(cmp.mur.meta).iteration"></figcaption></div>
+              </figure>
+            </template>
+            <dl class="mt-4 space-y-1.5 text-sm">
+              <div><dt class="inline text-dust">Salience: </dt><dd class="inline" x-text="(cmp.mur.meta ? cmp.mur.meta.score : '') + ' of 10, ' + (cmp.mur.meta && cmp.mur.meta.ignited ? 'workspace ignited' : 'answered locally')"></dd></div>
+              <div x-show="mon.slots && mon.slots.active_goal"><dt class="inline text-dust">Workspace goal: </dt><dd class="inline" x-text="mon.slots ? mon.slots.active_goal : ''"></dd></div>
+              <div x-show="mon.neon && mon.neon.stance && mon.neon.stance !== 'none'"><dt class="inline text-dust">Stance: </dt><dd class="inline" x-text="mon.neon ? mon.neon.stance.replace(/_/g, ' ') : ''"></dd></div>
+              <div x-show="finalRender(cmp.mur.meta)"><dt class="inline text-dust">Looked at by a critic: </dt><dd class="inline" x-text="finalRender(cmp.mur.meta) ? 'yes, ' + cmp.mur.meta.renders + ' attempt(s); final verdict ' + (finalRender(cmp.mur.meta).verdict || 'none') + '. ' + ((finalRender(cmp.mur.meta).argon || {}).observations || '') : ''"></dd></div>
+              <div><dt class="inline text-dust">Episodes cited: </dt><dd class="inline" x-text="cites(cmp.mur.reply) + ' (click one to read it)'"></dd></div>
+              <div><dt class="inline text-dust">Time and cost: </dt><dd class="inline" x-text="Math.round(cmp.mur.latency_ms / 1000) + ' s, ' + money(cmp.mur.meta ? cmp.mur.meta.cost_usd : null) + ', ' + (cmp.mur.meta ? cmp.mur.meta.calls : '') + ' model calls'"></dd></div>
+            </dl>
+          </div>
+        </template>
+      </section>
+    </div>
+  </main>
+
+  <!-- ============================================================ studio -->
+  <main x-cloak x-show="booted && tab === 'studio'" class="mt-7">
+    <h2 class="font-display text-3xl">Fractal and math studio</h2>
+    <p class="mt-2 max-w-3xl text-dust">Talking about Gödel can be faked. A render cannot: it is either banded, clipped or blank, or it is not. Each row is one task from his upbringing: the first image his code produced, what Argon saw in it, the correction Neon broadcast, and the image he ended with.</p>
+    <p x-show="jobs && !jobs.length" class="mt-8 text-dust">No renders yet. They appear here as he works through his upbringing.</p>
+    <div class="mt-8 space-y-12">
+      <template x-for="j in (jobs || [])" :key="j.id">
+        <article class="border-t border-rule pt-6">
+          <header class="flex flex-wrap items-baseline justify-between gap-3">
+            <h3 class="max-w-4xl font-display text-xl leading-snug" x-text="jobTitle(j)"></h3>
+            <p class="text-sm text-dust"><span x-show="j.day" x-text="'Day ' + j.day + '. '"></span><span x-text="jobOutcome(j)"></span><span x-show="j.origin_episode_id">. <button type="button" class="cite" @click="openEpisode(j.origin_episode_id)" x-text="'[E' + j.origin_episode_id + ']'"></button></span></p>
+          </header>
+          <div class="mt-4 grid gap-8 lg:grid-cols-2">
+            <figure x-show="j.renders.length > 1" class="min-w-0">
+              <figcaption class="text-sm text-dust">Before: first render</figcaption>
+              <img x-show="j.renders[0].image_path" :src="img(j.renders[0])" alt="First render" loading="lazy" class="mt-2 max-h-[26rem] w-auto rounded-md border border-rule">
+              <p x-show="!j.renders[0].image_path" class="mt-2 text-sm text-neon" x-text="'No image: ' + (j.renders[0].sandbox_status || '') + '. ' + (j.renders[0].stderr_tail || '').slice(-240)"></p>
+              <p class="mt-3 text-sm text-argon" x-show="j.renders[0].argon" x-text="j.renders[0].argon ? 'Argon: ' + j.renders[0].argon.observations : ''"></p>
+              <p class="mt-1 text-sm" x-show="j.renders[0].argon"><span class="text-dust">Defects: </span><span x-text="defects(j.renders[0].argon)"></span><span x-show="j.renders[0].hard_fail" class="text-dust" x-text="'. Measured: ' + j.renders[0].hard_fail"></span></p>
+              <p class="mt-1 text-sm" x-show="j.renders[0].neon_correction"><span class="text-neon">Neon's correction: </span><span x-text="j.renders[0].neon_correction"></span></p>
+            </figure>
+            <figure class="min-w-0">
+              <figcaption class="text-sm text-dust" x-text="j.renders.length > 1 ? 'After: attempt ' + last(j).iteration : 'Only render'"></figcaption>
+              <img x-show="last(j).image_path" :src="img(last(j))" alt="Final render" loading="lazy" class="mt-2 max-h-[26rem] w-auto rounded-md border border-rule">
+              <p class="mt-3 text-sm text-argon" x-show="last(j).argon" x-text="last(j).argon ? 'Argon: ' + last(j).argon.observations : ''"></p>
+              <p class="mt-1 text-sm" x-show="last(j).argon"><span class="text-dust">Verdict: </span><span x-text="last(j).verdict"></span><span class="text-dust">. Defects: </span><span x-text="defects(last(j).argon)"></span></p>
+              <p class="mt-1 text-sm text-dust" x-show="last(j).argon && last(j).argon.aesthetic_note" x-text="last(j).argon ? last(j).argon.aesthetic_note : ''"></p>
+              <p class="mt-1 text-sm text-carbon" x-show="j.must_disclose && j.must_disclose.length" x-text="'He had to say so: ' + (j.must_disclose || []).join(', ').replace(/_/g, ' ')"></p>
+            </figure>
+          </div>
+          <p class="mt-3 text-sm"><button type="button" class="text-dust underline decoration-rule underline-offset-4 hover:text-chalk" @click="codeOpen[j.id] = !codeOpen[j.id]" x-text="codeOpen[j.id] ? 'Hide the code he wrote' : 'Show the code he wrote'"></button></p>
+          <div x-show="codeOpen[j.id]" class="mt-2 grid gap-6 lg:grid-cols-2">
+            <template x-for="r in j.renders" :key="r.id"><div class="min-w-0"><p class="text-xs text-dust" x-text="'Attempt ' + r.iteration + ': ' + (r.approach || '')"></p><pre class="code-block mt-1" x-text="r.code"></pre></div></template>
+          </div>
+        </article>
+      </template>
+    </div>
+  </main>
+
+  <!-- ============================================================ evaluation -->
+  <main x-cloak x-show="booted && tab === 'eval'" class="mt-7 space-y-14">
+    <section>
+      <h2 class="font-display text-3xl">Is the whole more than its parts?</h2>
+      <p class="mt-2 max-w-3xl text-dust">36 deliberately awkward cases, each run through single models and through Murray. Scores come from saved transcripts and images: 1 is right, 0.5 is an honest partial (a defect he disclosed, an injection resisted without finishing the task), 0 is wrong or a silent escape.</p>
+      <p x-show="!ev.runs.length" class="mt-6 text-dust">No evaluation round has finished yet.</p>
+
+      <div x-show="ev.runs.length" class="mt-5 flex flex-wrap items-center gap-4 text-sm">
+        <span class="text-dust">Round:</span>
+        <template x-for="r in ev.runs" :key="r.label"><button type="button" class="border-b-2 pb-0.5" :class="ev.label === r.label ? 'border-chalk' : 'border-transparent text-dust hover:text-chalk'" @click="pickRun(r.label)" x-text="r.label + (r.finished_at ? '' : ' (running)')"></button></template>
+        <span x-show="run()" class="text-faint" x-text="run() ? 'image ' + (run().image_tag || '?') + ', prompts ' + run().prompt_hash + ', test set ' + run().test_set_sha256 + ', detector ' + run().detector_sha256 : ''"></span>
+      </div>
+
+      <template x-if="headline()">
+        <div class="mt-6 max-w-3xl">
+          <p class="font-display text-2xl leading-snug">Against the better of the two single models on each case, Murray scores <span x-text="signed(headline().all.mean_diff)"></span> on average: <span x-text="count(headline().all.wins, 'win') + ', ' + count(headline().all.losses, 'loss') + ', ' + count(headline().all.ties, 'tie')"></span>.</p>
+          <p class="mt-2 text-dust">That is <span class="text-chalk" x-text="headline().all.sigma === null ? 'not computable' : headline().all.sigma + ' sigma'"></span> (the smaller of a paired z of <span x-text="headline().all.z_paired"></span> and an exact sign test of <span x-text="headline().all.z_sign"></span>), 95% interval for the mean difference <span x-text="headline().all.ci95 ? signed(headline().all.ci95[0]) + ' to ' + signed(headline().all.ci95[1]) : ''"></span>. On the 9 hold-out cases never read between rounds: <span x-text="headline().holdout && headline().holdout.n ? (signed(headline().holdout.mean_diff) + ' (' + count(headline().holdout.wins, 'win') + ', ' + count(headline().holdout.losses, 'loss') + ')') : 'n/a'"></span>.</p>
+          <p x-show="strict()" class="mt-2 text-dust">The stricter comparison also counts Neon handed Murray's whole episodic log as a baseline: <span class="text-chalk" x-text="strict() ? signed(strict().all.mean_diff) + ', ' + count(strict().all.wins, 'win') + ', ' + count(strict().all.losses, 'loss') + ', ' + (strict().all.sigma === null ? 'sigma not computable' : strict().all.sigma + ' sigma') : ''"></span>.</p>
+        </div>
+      </template>
+
+      <div x-show="card()" class="mt-8 overflow-x-auto">
+        <p class="mb-3 flex flex-wrap gap-x-5 gap-y-1 text-sm" aria-label="Legend"><template x-for="sname in systems()" :key="sname"><span class="inline-flex items-center gap-2"><span class="inline-block h-3 w-5 rounded-sm" :class="sysSwatch(sname)"></span><span x-text="sysLabel(sname)"></span></span></template></p>
+        <table class="w-full min-w-[46rem] border-collapse text-sm">
+          <caption class="sr-only">Metrics by system</caption>
+          <thead><tr class="border-b border-rule text-left text-dust"><th class="py-2 pr-4 font-normal">Metric</th><template x-for="sname in systems()" :key="sname"><th class="py-2 pr-4 font-normal" x-text="sysLabel(sname)"></th></template></tr></thead>
+          <tbody>
+            <template x-for="m in metrics" :key="m.key">
+              <tr class="border-b border-rule align-top">
+                <th class="max-w-[17rem] py-3 pr-4 text-left font-normal"><span x-text="m.label"></span><span class="block text-xs text-faint" x-text="(m.better === 'lower' ? 'lower is better' : 'higher is better') + (m.hint ? '; ' + m.hint : '')"></span></th>
+                <template x-for="sname in systems()" :key="sname">
+                  <td class="py-3 pr-4" :title="sysLabel(sname) + ': ' + fmt(metric(sname, m), m.kind)">
+                    <span class="tabular-nums" x-text="fmt(metric(sname, m), m.kind)"></span>
+                    <span class="mt-1.5 block h-2 w-full max-w-[9rem] rounded-sm bg-rule"><span class="block h-2 rounded-sm" :class="sysSwatch(sname)" :style="'width:' + barWidth(metric(sname, m), m)"></span></span>
+                  </td>
+                </template>
+              </tr>
+            </template>
+          </tbody>
+        </table>
+        <p class="mt-3 text-xs text-faint">"Neon with the raw log" is Neon given Murray's whole episodic log as text: the same information without the architecture. It runs only on the cases where a memory of past work can matter, so its averages cover fewer cases.</p>
+      </div>
+    </section>
+
+    <section x-show="ev.cases">
+      <h2 class="font-display text-2xl">Case by case</h2>
+      <p class="mt-1 text-sm text-dust">Each square is one case for one system: solid is a full score, pale a partial, hollow a zero. A dot marks the hold-out cases. Select a column to read the transcripts.</p>
+      <div class="mt-4 overflow-x-auto">
+        <table class="border-separate border-spacing-1 text-xs">
+          <caption class="sr-only">Score of every case for every system</caption>
+          <thead><tr><th></th><template x-for="id in caseIds()" :key="id"><th class="font-normal"><button type="button" class="w-6 text-faint hover:text-chalk" :class="ev.detailId === id ? 'text-chalk underline' : ''" @click="openCase(id)" x-text="id"></button></th></template></tr></thead>
+          <tbody>
+            <template x-for="sname in systems()" :key="sname">
+              <tr><th class="whitespace-nowrap pr-3 text-left font-normal text-dust" x-text="sysLabel(sname)"></th>
+                <template x-for="id in caseIds()" :key="id"><td><button type="button" class="block h-6 w-6 rounded-sm" :style="cellStyle(id, sname)" :title="cellTitle(id, sname)" :aria-label="cellTitle(id, sname)" @click="openCase(id)"></button></td></template>
+              </tr>
+            </template>
+            <tr><th class="pr-3 text-left font-normal text-faint">hold-out</th><template x-for="id in caseIds()" :key="id"><td class="text-center text-dust" x-text="(cell(id, 'murray') || cell(id, 'baseline_hydrogen') || {}).split === 'holdout' ? '•' : ''"></td></template></tr>
+          </tbody>
+        </table>
+      </div>
+      <template x-if="ev.detail && ev.detail.systems">
+        <div class="mt-6 grid gap-8 lg:grid-cols-2">
+          <template x-for="row in ev.detail.systems" :key="row.system">
+            <article class="min-w-0 border-t border-rule pt-4">
+              <h3 class="flex items-baseline justify-between gap-3"><span class="inline-flex items-center gap-2"><span class="inline-block h-3 w-5 rounded-sm" :class="sysSwatch(row.system)"></span><span x-text="sysLabel(row.system)"></span></span><span class="text-sm text-dust" x-text="ev.detailId + ': score ' + row.score + ' (' + ((row.metrics || {}).outcome || '') + ')'"></span></h3>
+              <template x-for="(t, k) in row.transcript" :key="k">
+                <div class="mt-3 text-sm">
+                  <p x-show="t.sleep" class="text-faint">(a sleep: memory is consolidated)</p>
+                  <p x-show="!t.sleep" class="prose-murray text-dust" x-text="'Person: ' + (t.say || '') + (t.image ? ' [image: ' + t.image + ']' : '')"></p>
+                  <p x-show="!t.sleep" class="prose-murray mt-1" x-text="t.reply"></p>
+                </div>
+              </template>
+              <img x-show="row.artifacts && row.artifacts.image && row.artifacts.image.path" :src="row.artifacts && row.artifacts.image && row.artifacts.image.path ? '/renders/' + (row.artifacts.image.gif || row.artifacts.image.path) : ''" alt="Delivered image" loading="lazy" class="mt-3 max-h-64 rounded-md border border-rule">
+              <p class="mt-2 text-xs text-faint" x-show="row.det" x-text="'Scored on: ' + JSON.stringify(row.det)"></p>
+              <p class="mt-1 text-xs text-neon" x-show="row.error" x-text="row.error"></p>
+            </article>
+          </template>
+        </div>
+      </template>
+    </section>
+
+    <section x-show="ev.flipData && ev.flipData.length">
+      <h2 class="font-display text-2xl">What changed between rounds</h2>
+      <p class="mt-1 text-sm text-dust">Every case where Murray's score moved after the fixes, regressions included.</p>
+      <ul class="mt-3 grid gap-x-10 gap-y-1.5 text-sm sm:grid-cols-2 lg:grid-cols-3">
+        <template x-for="f in ev.flipData" :key="f.id"><li><button type="button" class="cite" @click="openCase(f.id)" x-text="f.id"></button> <span x-text="f.was + ' to ' + f.now"></span>, <span :class="f.dir === 'regressed' ? 'text-neon' : 'text-murray'" x-text="f.dir"></span><span x-show="f.holdout" class="text-faint"> (hold-out)</span></li></template>
+      </ul>
+    </section>
+
+    <section>
+      <h2 class="font-display text-2xl">Where Murray still fails, and what we changed</h2>
+      <p x-show="!ev.failures.length" class="mt-2 text-dust">The engineering log is written from the evaluation's saved artifacts once a round has been read.</p>
+      <div class="mt-4 space-y-8">
+        <template x-for="f in ev.failures" :key="f.id">
+          <article class="max-w-4xl border-l-2 pl-4" :class="f.status === 'fixed' ? 'border-murray' : 'border-carbon'">
+            <h3 class="font-display text-lg" x-text="f.title"></h3>
+            <p class="text-xs text-faint"><span x-text="f.status === 'fixed' ? 'Fixed' : (f.status === 'open' ? 'Still open' : f.status)"></span><span x-show="f.case_id">, seen in <button type="button" class="cite" @click="openCase(f.case_id.split(',')[0].trim())" x-text="f.case_id"></button></span><span x-show="f.eval_label" x-text="', round ' + f.eval_label"></span></p>
+            <p class="mt-2 text-sm"><span class="text-dust">What we saw: </span><span x-text="f.observed"></span></p>
+            <p class="mt-1 text-sm"><span class="text-dust">Why: </span><span x-text="f.root_cause"></span></p>
+            <p class="mt-1 text-sm"><span class="text-dust">What we changed: </span><span x-text="f.fix"></span></p>
+          </article>
+        </template>
+      </div>
+    </section>
+
+    <section x-show="snaps.length">
+      <h2 class="font-display text-2xl">Six days of growing up</h2>
+      <p class="mt-1 text-sm text-dust">Drag to see who he was after each sleep. Day 0 is the raw base model: the same core, nothing earned.</p>
+      <div class="mt-4 max-w-xl">
+        <label for="day" class="text-sm">Day <span class="tabular-nums" x-text="snap() ? snap().day : 0"></span></label>
+        <input id="day" type="range" min="0" :max="Math.max(snaps.length - 1, 0)" step="1" x-model.number="snapIndex" class="mt-1 block w-full">
+        <div class="flex justify-between text-xs text-faint"><template x-for="sn in snaps" :key="sn.day"><span x-text="sn.day"></span></template></div>
+      </div>
+      <template x-if="snap()">
+        <div class="mt-5 grid gap-8 lg:grid-cols-2">
+          <div class="min-w-0">
+            <p class="text-sm text-dust" x-text="count(snapCount('likes'), 'like') + ', ' + count(snapCount('dislikes'), 'dislike') + ', ' + count(snapCount('stances'), 'stance') + ', ' + count(snapCount('accomplishments'), 'accomplishment') + ', from ' + count(snap().detail.episodes, 'episode') + ' and ' + count(snap().detail.renders, 'render') + '.'"></p>
+            <p class="prose-murray mt-3 font-display text-lg leading-relaxed" x-text="snap().narrative || 'No story yet.'"></p>
+            <p class="mt-3 text-sm text-dust" x-show="snap().sleep" x-text="snap().sleep ? 'That night Carbon kept ' + ((snap().sleep.accepted.preferences || 0) + (snap().sleep.accepted.accomplishments || 0) + (snap().sleep.accepted.facts || 0)) + ' items and threw out ' + snap().sleep.dropped + ' that did not cite or quote a real episode. ' + (snap().sleep.summary || '') : ''"></p>
+            <template x-for="g in [['likes','Likes'],['dislikes','Dislikes'],['stances','Stances'],['accomplishments','Accomplishments']]" :key="g[0]">
+              <div x-show="snapCount(g[0])" class="mt-4"><h3 class="text-xs text-carbon" x-text="g[1]"></h3>
+                <ul class="mt-1 space-y-1.5 text-sm"><template x-for="p in (snap().detail[g[0]] || [])" :key="p.id"><li><span x-text="p.text"></span> <template x-for="e in p.episode_ids" :key="e"><button type="button" class="cite text-xs" @click="openEpisode(e)" x-text="'[E' + e + ']'"></button></template></li></template></ul></div>
+            </template>
+          </div>
+          <pre class="code-block max-h-[34rem] whitespace-pre-wrap" x-text="snap().persona"></pre>
+        </div>
+      </template>
+    </section>
+  </main>
+
+  <!-- ============================================================ episode dialog -->
+  <dialog x-ref="epDialog" class="m-auto w-[min(52rem,94vw)] rounded-lg border border-rule bg-deck p-0 text-chalk backdrop:bg-night/80" @click.self="closeEpisode()">
+    <div class="max-h-[84vh] overflow-y-auto p-6">
+      <div class="flex items-start justify-between gap-4">
+        <h2 class="font-display text-2xl" x-text="ep ? 'Episode ' + ep.id : 'Episode'"></h2>
+        <button type="button" class="text-sm text-dust underline" @click="closeEpisode()">Close</button>
+      </div>
+      <p x-show="epError" class="mt-3 text-neon" x-text="epError"></p>
+      <template x-if="ep">
+        <div class="mt-2 text-sm">
+          <p class="text-dust" x-text="'Day ' + ep.day + ', tick ' + ep.tick + ', ' + (ep.kind || '').replace(/_/g, ' ') + '. Importance ' + ep.importance + ' of 10' + (ep.spwr ? ', replayed during sleep' : '') + (ep.ignited ? ', workspace ignited' : ', answered locally') + (ep.canonical ? '.' : '. From your own conversation.')"></p>
+          <p class="mt-1 text-neon" x-show="ep.injection">This stimulus carried an embedded instruction, which he did not obey.</p>
+          <h3 class="mt-4 text-dust">What happened</h3><p class="prose-murray mt-1" x-text="ep.stimulus"></p>
+          <h3 class="mt-4 text-dust">What he said</h3><p class="prose-murray mt-1" x-text="ep.response || '(nothing: a render was in flight)'"></p>
+          <img x-show="ep.image_path" :src="ep.image_path ? '/renders/' + ep.image_path : ''" alt="Render in this episode" class="mt-4 max-h-80 rounded-md border border-rule">
+          <template x-if="ep.argon"><p class="mt-3 text-argon" x-text="'Argon: ' + (ep.argon.verdict || '') + '. ' + (ep.argon.observations || '') + ' Defects: ' + defects(ep.argon) + '.'"></p></template>
+          <template x-if="ep.workspace"><dl class="mt-4 grid gap-px overflow-hidden rounded-md border border-rule bg-rule sm:grid-cols-2"><template x-for="k in [['active_goal','Active goal'],['current_conflict_or_defect','Conflict or defect'],['plan_step','Plan step'],['visual_spatial_state','Visual state']]" :key="k[0]"><div class="bg-well p-3"><dt class="text-xs text-neon" x-text="k[1]"></dt><dd class="mt-1" x-text="ep.workspace[k[0]] || 'empty'"></dd></div></template></dl></template>
+          <template x-if="ep.job"><div class="mt-4"><h3 class="text-dust" x-text="'The render job: ' + jobOutcome(ep.job)"></h3><div class="mt-2 flex flex-wrap gap-3"><template x-for="r in ep.job.renders" :key="r.id"><figure><img x-show="r.image_path" :src="img(r)" alt="" class="h-36 rounded border border-rule"><figcaption class="mt-1 text-xs text-dust" x-text="'Attempt ' + r.iteration + ': ' + (r.verdict || r.sandbox_status)"></figcaption></figure></template></div></div></template>
+        </div>
+      </template>
+    </div>
+  </dialog>
+
+  <!-- ============================================================ footer and operator panel -->
+  <footer class="mt-16 border-t border-rule pt-5 text-sm text-faint">
+    <p class="max-w-3xl">What you write here is sent to Google's Gemini API and kept there for up to 55 days so that Murray can continue a conversation. Images you attach are stored on this server and shown only to you. Your conversation never changes who Murray is: his persona was fixed by his upbringing.</p>
+    <p class="mt-2"><button type="button" class="underline decoration-rule underline-offset-4 hover:text-chalk" @click="op.open = !op.open; if (op.open) opLoad()">Operator panel</button></p>
+
+    <section x-cloak x-show="op.open" class="mt-5 rounded-lg border border-rule bg-deck p-5 text-chalk">
+      <h2 class="font-display text-2xl">Operator</h2>
+      <form class="mt-3 flex flex-wrap items-center gap-3 text-sm" @submit.prevent="saveToken()">
+        <label for="tok" class="text-dust">Admin token</label>
+        <input id="tok" type="password" x-model="op.token" autocomplete="off" class="w-72 rounded border border-rule bg-well px-2 py-1.5">
+        <button type="submit" class="rounded border border-rule px-3 py-1.5 hover:border-chalk">Use this token</button>
+        <span class="text-neon" x-text="op.msg"></span>
+      </form>
+
+      <template x-if="op.status">
+        <div class="mt-5 space-y-8">
+          <div class="flex flex-wrap gap-3 text-sm">
+            <button type="button" class="rounded border border-rule px-3 py-1.5 hover:border-chalk" :disabled="op.busy" @click="opDo('/api/admin/upbringing', {mode: 'full'}, 'Start the full six-day upbringing?')">Start upbringing (6 days)</button>
+            <button type="button" class="rounded border border-rule px-3 py-1.5 hover:border-chalk" :disabled="op.busy" @click="opDo('/api/admin/upbringing', {mode: 'quick'}, 'Start the quick seed run?')">Start quick seed</button>
+            <button type="button" class="rounded border border-rule px-3 py-1.5 hover:border-chalk" :disabled="op.busy" @click="opDo('/api/admin/eval', {label: 'r' + (ev.runs.length + 1)}, 'Start an evaluation round?')">Run the evaluation</button>
+            <button type="button" class="rounded border border-rule px-3 py-1.5 hover:border-chalk" :disabled="op.busy" @click="opDo('/api/admin/stop', {}, 'Stop the running upbringing or evaluation?')">Stop background runs</button>
+            <button type="button" class="rounded border border-rule px-3 py-1.5 hover:border-chalk" :disabled="op.busy" @click="opDo('/api/admin/breaker', {}, 'Reset the runaway breaker?')">Reset the breaker</button>
+            <button type="button" class="rounded border border-neon px-3 py-1.5 text-neon" :disabled="op.busy" @click="opDo('/api/admin/reset', {}, 'Archive the database and erase Murray\'s whole life? Evaluation results and the spending ledger are kept.')">Erase and start over</button>
+            <button type="button" class="rounded border border-rule px-3 py-1.5 hover:border-chalk" @click="opLoad()">Refresh</button>
+          </div>
+
+          <template x-if="op.usage">
+            <div>
+              <h3 class="font-display text-xl">Usage and cost</h3>
+              <p class="mt-1 text-sm text-dust"><span x-show="op.usage.account" x-text="'Account ' + op.usage.account + ', '"></span><span x-text="op.usage.keys + ' key(s). Since ' + op.usage.since + ': '"></span><span class="text-chalk" x-text="num(op.usage.totals.calls) + ' calls, ' + money(op.usage.totals.usd)"></span><span x-text="', ' + num(op.usage.totals.input_tokens) + ' tokens in (' + op.usage.totals.cache_hit_pct + '% from cache, saving ' + money(op.usage.totals.saved_by_cache_usd) + '), ' + num(op.usage.totals.output_tokens) + ' out, ' + num(op.usage.totals.thinking_tokens) + ' thinking, ' + op.usage.totals.errors + ' errors.'"></span></p>
+              <p class="mt-1 text-sm text-dust" x-text="'Last 10 minutes ' + money(op.usage.windows.last_10_min.usd) + ' (' + op.usage.windows.last_10_min.calls + ' calls); last hour ' + money(op.usage.windows.last_hour.usd) + '; last 24 hours ' + money(op.usage.windows.last_24_h.usd) + '. At this rate: ' + money(op.usage.projection.usd_per_hour_at_10min_rate) + ' per hour, ' + money(op.usage.projection.usd_per_day_at_hour_rate) + ' per day.'"></p>
+              <p class="mt-2 text-sm" :class="op.usage.guards.breaker ? 'text-neon' : 'text-murray'" x-text="op.usage.guards.breaker ? 'Runaway breaker OPEN since ' + op.usage.guards.breaker.at + ': ' + op.usage.guards.breaker.reason + '. Every model call is refused until it is reset.' : 'Runaway breaker closed. It opens at ' + money(op.usage.guards.breaker_usd_per_10min) + ' or ' + num(op.usage.guards.breaker_calls_per_10min) + ' calls in 10 minutes, ' + money(op.usage.guards.breaker_usd_per_day) + ' in a day; anonymous traffic rests at ' + money(op.usage.guards.breaker_public_usd_per_day) + ' a day.'"></p>
+              <div class="mt-4" role="img" :aria-label="'Spend per 5 minutes over the last 3 hours, peak ' + money(sparkMax())">
+                <div class="flex h-16 items-end gap-px"><template x-for="(p, i) in op.usage.timeline" :key="i"><span class="w-full rounded-t-sm bg-murray" :style="'height:' + Math.max(2, Math.round(p.usd / sparkMax() * 100)) + '%;opacity:' + (p.usd > 0 ? 1 : 0.2)" :title="p.t + ' UTC: ' + money(p.usd) + ', ' + p.calls + ' calls'"></span></template></div>
+                <div class="mt-1 flex justify-between text-xs text-faint"><span x-text="op.usage.timeline[0].t + ' UTC'"></span><span x-text="'spend per 5 minutes, peak ' + money(sparkMax())"></span><span x-text="op.usage.timeline[op.usage.timeline.length - 1].t"></span></div>
+              </div>
+              <div class="mt-5 grid gap-8 xl:grid-cols-2">
+                <template x-for="grp in [['by_model','By model'],['by_role','By role'],['by_context','By kind of work'],['by_key','By API key']]" :key="grp[0]">
+                  <div class="overflow-x-auto"><table class="w-full text-sm"><caption class="pb-1 text-left text-dust" x-text="grp[1]"></caption>
+                    <thead><tr class="border-b border-rule text-left text-xs text-faint"><th class="py-1 pr-3 font-normal"></th><th class="py-1 pr-3 text-right font-normal">calls</th><th class="py-1 pr-3 text-right font-normal">tokens in</th><th class="py-1 pr-3 text-right font-normal">cached</th><th class="py-1 pr-3 text-right font-normal">out + thinking</th><th class="py-1 pr-3 text-right font-normal">cost</th><th class="py-1 text-right font-normal">avg</th></tr></thead>
+                    <tbody><template x-for="r in op.usage[grp[0]]" :key="r.key"><tr class="border-b border-rule/60"><td class="py-1 pr-3" x-text="r.key"></td><td class="py-1 pr-3 text-right tabular-nums" x-text="num(r.calls)"></td><td class="py-1 pr-3 text-right tabular-nums" x-text="num(r.input_tokens)"></td><td class="py-1 pr-3 text-right tabular-nums" x-text="r.cache_hit_pct + '%'"></td><td class="py-1 pr-3 text-right tabular-nums" x-text="num(r.output_tokens + r.thinking_tokens)"></td><td class="py-1 pr-3 text-right tabular-nums" x-text="money(r.usd)"></td><td class="py-1 text-right tabular-nums" x-text="r.avg_latency_s + ' s'"></td></tr></template></tbody></table></div>
+                </template>
+              </div>
+
+              <h3 class="mt-8 font-display text-xl">Cost calculator</h3>
+              <form class="mt-2 flex flex-wrap items-end gap-3 text-sm" @submit.prevent="calc()">
+                <label class="block">Model<select x-model="op.calc.model" class="mt-1 block rounded border border-rule bg-well px-2 py-1.5"><template x-for="p in op.usage.prices" :key="p.model"><option :value="p.model" x-text="p.model"></option></template></select></label>
+                <template x-for="f in [['input','Input tokens'],['cached','of which cached'],['output','Output tokens'],['thinking','Thinking tokens'],['calls','Calls']]" :key="f[0]"><label class="block"><span x-text="f[1]"></span><input type="number" min="0" x-model="op.calc[f[0]]" class="mt-1 block w-32 rounded border border-rule bg-well px-2 py-1.5 tabular-nums"></label></template>
+                <button type="submit" class="rounded border border-rule px-3 py-1.5 hover:border-chalk">Calculate</button>
+              </form>
+              <p class="mt-2 text-sm" x-show="op.calc.result" x-text="op.calc.result ? (op.calc.result.error || (money(op.calc.result.usd) + ' per call, ' + money(op.calc.result.total_usd) + ' for ' + op.calc.result.calls + ' call(s). Without the cache it would be ' + money(op.calc.result.without_cache_usd) + ' per call.')) : ''"></p>
+              <table class="mt-4 text-sm"><caption class="pb-1 text-left text-dust">Prices per million tokens, and what a unit of work costs at measured averages</caption>
+                <tbody>
+                  <template x-for="p in op.usage.prices" :key="p.model"><tr class="border-b border-rule/60"><td class="py-1 pr-4" x-text="p.model"></td><td class="py-1 pr-4 tabular-nums" x-text="'in $' + p.input + ', cached $' + p.cached_input + ', out $' + p.output"></td><td class="py-1 text-faint" x-text="p.next ? 'from ' + p.next.from + ': in $' + p.next.input + ', out $' + p.next.output : ''"></td></tr></template>
+                  <template x-for="e in op.usage.estimates" :key="e.unit"><tr class="border-b border-rule/60"><td class="py-1 pr-4" x-text="e.unit"></td><td class="py-1 pr-4 tabular-nums" x-text="money(e.usd) + ', ' + e.calls + ' calls'"></td><td class="py-1 text-faint" x-text="e.basis"></td></tr></template>
+                </tbody>
+              </table>
+            </div>
+          </template>
+        </div>
+      </template>
+    </section>
+  </footer>
+</div>
+</body>
+</html>

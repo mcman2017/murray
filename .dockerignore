@@ -1,0 +1,16 @@
+# Everything is excluded; only what the image needs is let back in.
+*
+!requirements.txt
+!requirements-dev.txt
+!murray/
+!web/
+!eval/
+!tests/
+**/__pycache__
+**/.pytest_cache
+**/*.pyc
+**/*.db
+**/*.db-wal
+**/*.db-shm
+eval/results/
+web/static/app.css

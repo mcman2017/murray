@@ -1,0 +1,55 @@
+@import "tailwindcss";
+@source "./index.html";
+@source "./app.js";
+
+/* An observatory at night: deep blue-black surfaces, chalk-white ink, and one colour per model. The model colours
+   and the chart series colours were checked for colour-vision-deficiency separation against these surfaces. */
+@theme {
+  --color-night: #0e1320;
+  --color-deck: #151c2e;
+  --color-well: #101728;
+  --color-rule: #27314a;
+  --color-chalk: #e9e6dc;
+  --color-dust: #9aa3b8;
+  --color-faint: #6f7994;
+  --color-hydrogen: #3987e5;
+  --color-neon: #d95926;
+  --color-argon: #9085e9;
+  --color-carbon: #c98500;
+  --color-murray: #199e70;
+  --font-display: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+  --font-body: "Avenir Next", Avenir, "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-code: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
+}
+
+html { color-scheme: dark; }
+body { font-family: var(--font-body); background: var(--color-night); color: var(--color-chalk); }
+[x-cloak] { display: none !important; }
+
+:focus-visible { outline: 2px solid var(--color-chalk); outline-offset: 2px; border-radius: 2px; }
+
+/* Component classes sit in the components layer so that a utility class on the same element can override them. */
+@layer components {
+  .prose-murray { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.6; }
+  .code-block { font-family: var(--font-code); font-size: 0.78rem; line-height: 1.5; white-space: pre; overflow: auto;
+    background: var(--color-well); border: 1px solid var(--color-rule); border-radius: 6px; padding: 0.75rem; max-height: 22rem; }
+}
+
+/* The four model lanes: a trace that lights when the model fires. */
+.lane-trace { height: 3px; border-radius: 2px; background: var(--color-rule); position: relative; overflow: hidden; }
+.lane-trace > i { position: absolute; inset: 0; transform-origin: left; transform: scaleX(0); opacity: 0.25; background: currentColor; }
+.lane-on .lane-trace > i { transform: scaleX(1); opacity: 1; transition: transform 500ms ease-out, opacity 200ms; }
+.lane-busy .lane-trace > i { animation: lane-run 1.4s ease-in-out infinite; opacity: 1; }
+@keyframes lane-run { 0% { transform: scaleX(0.05); } 50% { transform: scaleX(1); } 100% { transform: scaleX(0.05); } }
+@media (prefers-reduced-motion: reduce) {
+  .lane-busy .lane-trace > i { animation: none; transform: scaleX(1); }
+  .lane-on .lane-trace > i { transition: none; }
+}
+
+/* "Neon with the raw log" is the same entity as Neon: same hue, hatched. */
+.hatch { background-image: repeating-linear-gradient(135deg, rgba(14, 19, 32, 0.55) 0 3px, transparent 3px 7px); }
+
+.cite { color: var(--color-chalk); text-decoration: underline; text-decoration-color: var(--color-murray); text-underline-offset: 3px; cursor: pointer; }
+.cite:hover { text-decoration-thickness: 2px; }
+
+input[type="range"] { accent-color: var(--color-murray); }

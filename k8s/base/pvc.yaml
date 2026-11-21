@@ -1,0 +1,12 @@
+# Murray's SQLite database, persona, evaluation results and rendered images live here (mounted at /data).
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: murray-data
+  namespace: ${MURRAY_NAMESPACE}
+  labels: { app.kubernetes.io/name: murray, app.kubernetes.io/component: app, app.kubernetes.io/part-of: murray }
+spec:
+  accessModes: [ReadWriteOnce]
+  storageClassName: ${STORAGE_CLASS}
+  resources:
+    requests: { storage: 5Gi }

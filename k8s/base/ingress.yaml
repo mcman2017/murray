@@ -1,0 +1,29 @@
+# Public route for a fresh install: one host, TLS from cert-manager. The annotations keep Server-Sent Events
+# flowing (no proxy buffering, long timeouts) and allow image uploads.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: murray
+  namespace: ${MURRAY_NAMESPACE}
+  labels: { app.kubernetes.io/name: murray, app.kubernetes.io/part-of: murray }
+  annotations:
+    cert-manager.io/cluster-issuer: ${CLUSTER_ISSUER}
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-buffering: "off"
+    nginx.ingress.kubernetes.io/proxy-request-buffering: "off"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-body-size: 6m
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts: [${MURRAY_HOST}]
+      secretName: murray-tls
+  rules:
+    - host: ${MURRAY_HOST}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend: { service: { name: murray, port: { number: 80 } } }

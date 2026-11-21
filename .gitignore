@@ -1,0 +1,29 @@
+# private: never published
+_cluster_backup/
+k8s.local/
+.env
+.env.*
+!.env.example
+_data/
+initial-prompt.md
+CLAUDE.local.md
+
+# databases and runtime artifacts
+*.db
+*.db-wal
+*.db-shm
+*.sqlite*
+
+# python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.venv/
+venv/
+
+# build output
+web/static/app.css
+*.log
+.DS_Store

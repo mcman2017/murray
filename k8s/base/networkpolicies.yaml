@@ -1,0 +1,48 @@
+# Default deny, then named allows.
+#   app:     in  <- the ingress controller (8000)
+#            out -> cluster DNS, the sandbox (8100), the public internet on 443 only (never private ranges)
+#   sandbox: in  <- the app (8100)
+#            out -> nothing at all, not even DNS: model-written code runs here
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata: { name: default-deny-all, namespace: ${MURRAY_NAMESPACE} }
+spec:
+  podSelector: {}
+  policyTypes: [Ingress, Egress]
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata: { name: murray-app, namespace: ${MURRAY_NAMESPACE} }
+spec:
+  podSelector: { matchLabels: { app.kubernetes.io/name: murray, app.kubernetes.io/component: app } }
+  policyTypes: [Ingress, Egress]
+  ingress:
+    - from:
+        - namespaceSelector: { matchLabels: { kubernetes.io/metadata.name: ${INGRESS_NAMESPACE} } }
+          podSelector: { matchLabels: { app.kubernetes.io/name: ingress-nginx, app.kubernetes.io/component: controller } }
+      ports: [{ protocol: TCP, port: 8000 }]
+  egress:
+    - to:
+        - namespaceSelector: { matchLabels: { kubernetes.io/metadata.name: kube-system } }
+          podSelector: { matchLabels: { k8s-app: kube-dns } }
+      ports: [{ protocol: UDP, port: 53 }, { protocol: TCP, port: 53 }]
+    - to:
+        - podSelector: { matchLabels: { app.kubernetes.io/name: murray, app.kubernetes.io/component: sandbox } }
+      ports: [{ protocol: TCP, port: 8100 }]
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+            except: [10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16, 100.64.0.0/10, 169.254.0.0/16]
+      ports: [{ protocol: TCP, port: 443 }]
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata: { name: murray-sandbox, namespace: ${MURRAY_NAMESPACE} }
+spec:
+  podSelector: { matchLabels: { app.kubernetes.io/name: murray, app.kubernetes.io/component: sandbox } }
+  policyTypes: [Ingress, Egress]
+  ingress:
+    - from:
+        - podSelector: { matchLabels: { app.kubernetes.io/name: murray, app.kubernetes.io/component: app } }
+      ports: [{ protocol: TCP, port: 8100 }]
+  egress: []

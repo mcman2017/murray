@@ -1,0 +1,70 @@
+# The sandbox: runs the Python that the model writes. It has no API key, no data volume, and (see
+# networkpolicies.yaml) no network egress at all. Same image as the app, different role.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: murray-sandbox
+  namespace: ${MURRAY_NAMESPACE}
+  labels: { app.kubernetes.io/name: murray, app.kubernetes.io/component: sandbox, app.kubernetes.io/part-of: murray }
+spec:
+  replicas: 1
+  revisionHistoryLimit: 5
+  selector:
+    matchLabels: { app.kubernetes.io/name: murray, app.kubernetes.io/component: sandbox }
+  template:
+    metadata:
+      labels: { app.kubernetes.io/name: murray, app.kubernetes.io/component: sandbox, app.kubernetes.io/part-of: murray }
+    spec:
+      automountServiceAccountToken: false
+      enableServiceLinks: false
+      imagePullSecrets: [{ name: ${PULL_SECRET} }]
+      terminationGracePeriodSeconds: 10
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 14102          # a uid nothing else uses, so the process limit counts only sandbox processes
+        runAsGroup: 14102
+        seccompProfile: { type: RuntimeDefault }
+      containers:
+        - name: sandbox
+          image: ${MURRAY_IMAGE}
+          imagePullPolicy: IfNotPresent
+          env:
+            - { name: MURRAY_ROLE, value: sandbox }
+            - { name: HOME, value: /tmp }
+          ports:
+            - { name: http, containerPort: 8100 }
+          startupProbe:
+            httpGet: { path: /healthz, port: http }
+            periodSeconds: 3
+            failureThreshold: 40
+          readinessProbe:
+            httpGet: { path: /healthz, port: http }
+            periodSeconds: 10
+          livenessProbe:
+            httpGet: { path: /healthz, port: http }
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 6
+          resources:
+            requests: { cpu: 250m, memory: 256Mi }
+            limits: { cpu: "3", memory: 3584Mi }
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: { drop: [ALL] }
+          volumeMounts:
+            - { name: tmp, mountPath: /tmp }
+      volumes:
+        - name: tmp
+          emptyDir: { medium: Memory, sizeLimit: 512Mi }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: murray-sandbox
+  namespace: ${MURRAY_NAMESPACE}
+  labels: { app.kubernetes.io/name: murray, app.kubernetes.io/component: sandbox, app.kubernetes.io/part-of: murray }
+spec:
+  selector: { app.kubernetes.io/name: murray, app.kubernetes.io/component: sandbox }
+  ports:
+    - { name: http, port: 8100, targetPort: http }
