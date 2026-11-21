@@ -39,8 +39,16 @@ LOG_TYPES = {"pushback", "synthesis"}          # where a memory of past work can
 
 
 def load_test_set() -> tuple[dict, str]:
+    """The first 36 cases, plus the 36 of the extension when that file is present. The hash names what was loaded:
+    the first set's hash alone, or both joined by '+'."""
     raw = (HERE / "test_set.json").read_bytes()
-    return json.loads(raw), hashlib.sha256(raw).hexdigest()[:16]
+    data, sha = json.loads(raw), hashlib.sha256(raw).hexdigest()[:16]
+    ext = HERE / "test_set_ext.json"
+    if ext.is_file():
+        raw_ext = ext.read_bytes()
+        data["cases"] = data["cases"] + json.loads(raw_ext)["cases"]
+        data["extension_sha256"] = hashlib.sha256(raw_ext).hexdigest()[:16]
+    return data, sha
 
 
 def _fixture(name: str) -> bytes:
@@ -227,6 +235,27 @@ async def rejudge(engine: Engine, label: str) -> dict:
     return {"rejudged": again, "mean_scores": {s: v["mean_score"] for s, v in card["systems"].items()}}
 
 
+def with_combined(db: DB, run_id: int, card: dict, test_set: dict) -> dict:
+    """If another finished round ran the same system (same prompt hash) on different cases, add the paired statistics
+    over both rounds' cases together. Rounds are named r1, r2, ...; smoke runs are ignored."""
+    row = db.one("SELECT label, prompt_hash FROM eval_runs WHERE id=?", (run_id,))
+    mine = results_for(db, run_id)
+    my_cases = {r["case_id"] for r in mine}
+    for other in db.q("SELECT id, label FROM eval_runs WHERE prompt_hash=? AND id<>? AND status='done' ORDER BY id", (row["prompt_hash"], run_id)):
+        label = other["label"] or ""
+        if not (label[:1] == "r" and label[1:].isdigit()):
+            continue
+        theirs = results_for(db, other["id"])
+        if not theirs or {r["case_id"] for r in theirs} & my_cases:
+            continue
+        both = scoring.scorecard(test_set["cases"], mine + theirs)
+        card["combined"] = {"with": label, "cases": len(my_cases | {r["case_id"] for r in theirs}),
+                            "systems": {s: {"n": v["n"], "mean_score": v["mean_score"], "by_category": v["by_category"]} for s, v in both["systems"].items()},
+                            "comparison": both.get("comparison", {})}
+        break
+    return card
+
+
 def rescore(db: DB, label: str) -> dict:
     """Re-score a stored round from its artifacts with the current scorer, and rewrite its scorecard."""
     test_set, _ = load_test_set()
@@ -241,7 +270,7 @@ def rescore(db: DB, label: str) -> dict:
         metrics = loads(r["metrics_json"], {}) or {}
         metrics["outcome"] = scored["outcome"]
         db.x("UPDATE eval_results SET score=?, det_json=?, metrics_json=? WHERE id=?", (scored["score"], dumps(scored["det"]), dumps(metrics), r["id"]))
-    card = scoring.scorecard(test_set["cases"], results_for(db, run_id))
+    card = with_combined(db, run_id, scoring.scorecard(test_set["cases"], results_for(db, run_id)), test_set)
     db.x("INSERT OR REPLACE INTO eval_scorecards(eval_run_id, json, created_at) VALUES(?,?,?)", (run_id, dumps(card), now()))
     return card
 
@@ -251,7 +280,13 @@ async def run(engine: Engine, label: str = "r1", systems: list[str] | None = Non
     db = engine.db
     test_set, sha = load_test_set()
     systems = systems or SYSTEMS
-    cases = [c for c in test_set["cases"] if not case_ids or c["id"] in case_ids]
+    if case_ids in (["base"], ["extension"]):          # a whole set by name
+        case_ids = [c["id"] for c in test_set["cases"] if (c.get("set") == "extension") == (case_ids == ["extension"])]
+    elif not case_ids:                                  # by default a round is the first set, as rounds 1 and 2 were
+        case_ids = [c["id"] for c in test_set["cases"] if c.get("set") != "extension"]
+    cases = [c for c in test_set["cases"] if c["id"] in case_ids]
+    if any(c.get("set") == "extension" for c in cases):
+        sha = test_set.get("extension_sha256") or sha
     row = db.one("SELECT * FROM eval_runs WHERE label=?", (label,))
     flags = {"argon_hints": engine.argon_hints, "systems": systems}
     if row is None:
@@ -282,7 +317,8 @@ async def run(engine: Engine, label: str = "r1", systems: list[str] | None = Non
         engine.emit("canon", "eval_progress", {"label": label, **progress})
 
     await asyncio.gather(*(one(c, s) for c, s in pairs))
-    card = scoring.scorecard(test_set["cases"], results_for(db, run_id))
+    db.update("eval_runs", run_id, status="done")              # so that a sibling round can find this one
+    card = with_combined(db, run_id, scoring.scorecard(test_set["cases"], results_for(db, run_id)), test_set)
     db.x("INSERT OR REPLACE INTO eval_scorecards(eval_run_id, json, created_at) VALUES(?,?,?)", (run_id, dumps(card), now()))
     db.update("eval_runs", run_id, status="paused" if progress.get("skipped") else "done", finished_at=now())
     engine.emit("canon", "eval_done", {"label": label, "skipped": progress.get("skipped", 0)})

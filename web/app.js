@@ -334,6 +334,7 @@ function murray() {
     },
     headline() { const c = this.card(); return c && c.comparison ? (c.comparison.vs_best_single_model || c.comparison.vs_best_baseline) : null; },
     strict() { const c = this.card(); return c && c.comparison && c.comparison.vs_best_single_model && c.comparison.vs_baseline_neon_log ? c.comparison.vs_best_baseline : null; },
+    combined() { const c = this.card(); return c && c.combined && c.combined.comparison && c.combined.comparison.vs_best_single_model ? c.combined : null; },
     signed(v) { return v === null || v === undefined ? 'n/a' : (v >= 0 ? '+' : '') + Number(v).toFixed(3); },
     caseIds() { return this.ev.cases ? Object.keys(this.ev.cases).sort() : []; },
     cell(id, s) { const row = this.ev.cases && this.ev.cases[id]; return row ? row[s] : null; },

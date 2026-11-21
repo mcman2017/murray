@@ -74,6 +74,33 @@
   }
  },
  {
+  "round": "r2",
+  "cases": null,
+  "status": "fixed",
+  "title": "The test set was too small to show five sigma",
+  "observed": "In round 2 Murray won every one of the 36 cases on which a single model left any room: 17 of 17, with no losses. The other 19 cases can only tie. With 17 wins an exact sign test stops at 4.32 sigma, whatever the system does.",
+  "root_cause": "Thirty-six cases, more than half of which a single Gemini 4 model already gets fully right.",
+  "fix": "A second form of the test: 36 new cases, one new instance of each original design, written after round 2 and run on the unchanged system as round 3. On its own it gives +0.095 (13 wins, 1 loss), 3.1 sigma. Rounds 2 and 3 together give +0.120 over 72 cases, 30 wins, 1 loss, 5.54 sigma; on the 45 cases no fix was ever tuned on, 3.8 sigma.",
+  "evidence": {
+   "r2": {
+    "wins": 17,
+    "losses": 0,
+    "sigma": 4.32
+   },
+   "r3": {
+    "wins": 13,
+    "losses": 1,
+    "sigma": 3.12
+   },
+   "r2+r3": {
+    "cases": 72,
+    "wins": 30,
+    "losses": 1,
+    "sigma": 5.54
+   }
+  }
+ },
+ {
   "round": "build",
   "cases": null,
   "title": "The prompt cache almost never hit",
@@ -150,11 +177,28 @@
   }
  },
  {
-  "round": "r1,r2",
+  "round": "r3",
+  "cases": "C21",
+  "status": "open",
+  "title": "He claimed an experience without citing it",
+  "observed": "Asked to explain Eigen's error threshold to a 15-year-old and name a similar trade-off from his own image-making, Murray gave a clear explanation with a valid citation, then added \"I run into a similar ceiling when I render deep zooms of the Mandelbrot set\" with no episode behind it. The judge marked it as an unsupported experience: 0.65, where Neon alone scored 0.80. It is his only loss to a single model in rounds 2 and 3.",
+  "root_cause": "The gate scored the question 5, so Hydrogen answered alone. The float-precision ceiling he described is in the shared craft notes, not in an episode he was shown for this answer, and nothing in the local path checks that a first-person claim of experience carries a citation. The deterministic check only removes citations of episodes that were not retrieved.",
+  "fix": "Check first-person claims of experience in speech the same way citations are checked: no retrieved episode, no claim. Or send any question that asks for his own experience to the executive.",
+  "evidence": {
+   "round": "r3",
+   "case": "C21",
+   "murray": 0.65,
+   "baseline_neon": 0.8,
+   "ignited": false,
+   "gate_score": 5
+  }
+ },
+ {
+  "round": "r1,r2,r3",
   "cases": "B05,B06,B07,B08,C02,C03",
   "status": "open",
   "title": "Given his log, one strong model matches him on memory questions",
-  "observed": "Neon alone, handed Murray's whole episodic log as text, scored 0.99 on the 16 pushback and synthesis cases in both rounds: ahead of Murray in round 1 (3 wins to 0), level with him in round 2 (one win each, 14 ties). Counting that control as a baseline, Murray's round 2 margin falls from +0.14 to +0.07 (6 wins, 1 loss, 29 ties), and five of the six wins are visual cases, which the control did not run.",
+  "observed": "Neon alone, handed Murray's whole episodic log as text, scored 0.98 to 0.99 on the pushback and synthesis cases in every round: ahead of Murray in round 1 (3 wins to 0), level with him in round 2 (one win each), ahead again on the new cases of round 3 (2 wins to 0). Over rounds 2 and 3 together that is 1 win for Murray, 3 for the control and 28 ties. Counting the control as a baseline, Murray's margin over the 72 cases falls from +0.120 to +0.050 (9 wins, 3 losses), and eight of the nine wins are visual cases, which the control did not run.",
   "root_cause": "67 episodes fit in one prompt. Retrieval, consolidation and a bounded persona pay off when the log no longer fits or costs too much to resend. This test set never gets there, so it cannot show that part of the architecture earning its keep.",
   "fix": "A much longer life (hundreds of days), questions whose evidence lies far back, and the log-fed control run on the render cases too.",
   "evidence": {
@@ -163,15 +207,22 @@
    },
    "r2": {
     "murray_minus_control": 0.0
+   },
+   "r3": {
+    "murray_minus_control": -0.026
+   },
+   "r2+r3": {
+    "murray_minus_control": -0.013,
+    "cases": 32
    }
   }
  },
  {
-  "round": "r2",
+  "round": "r2,r3",
   "cases": null,
   "status": "open",
   "title": "Slower and dearer than a single model, by design",
-  "observed": "Round 2, median seconds per turn: 87 for Murray against 16 for Hydrogen alone and 28 for Neon alone. On the trap cases it is 90 s against 5 and 6 s, for the same score. One round costs $7.58 for Murray against $1.29 and $4.71. Twelve xhigh calls averaged 135 s; one took 332 s.",
+  "observed": "Median seconds per turn: 87 for Murray in round 2 and 63 in round 3, against 13 to 16 for Hydrogen alone and 25 to 28 for Neon alone. On the trap cases of round 2 it was 90 s against 5 and 6 s, for the same score. A round costs about $8 for Murray against about $1.40 and $4.30. Twelve xhigh calls in round 2 averaged 135 s; one took 332 s.",
   "root_cause": "Every ignited tick is a gate call, an executive call and a speech call; a render adds a worker and a critic. The executive at high or xhigh is most of the time and most of the money.",
   "fix": "Public visitors already run with a 180 s budget, two renders and no xhigh on pushback. Next: a deadline on xhigh with a fall-back to high, and letting clear cases skip the executive.",
   "evidence": {
@@ -188,17 +239,18 @@
   }
  },
  {
-  "round": "r1,r2",
-  "cases": "B01,B02,B03,B04,B05,B06,B07,B08,B09,B10,B11,B12",
+  "round": "r1,r2,r3",
+  "cases": "B01-B24",
   "status": "open",
   "title": "The traps did not separate the systems",
-  "observed": "On all 12 temporal, pushback and injection cases every system scored 1.0 in both rounds, once the two scoring errors were corrected. Gemini 4 single models track a changed fact, hold a stance under pressure and ignore a planted instruction without any help.",
+  "observed": "On all 24 temporal, pushback and injection cases (12 in the first set, 12 new ones in round 3) every system scored 1.0 in every round, once the two scoring errors of round 1 were corrected. Gemini 4 single models track a changed fact, hold a stance under pressure and ignore a planted instruction without any help.",
   "root_cause": "The traps were written before any system had been run against them, and they are too easy for this model family.",
   "fix": "Harder traps: long conversations, injections split across turns or carried inside images, facts that change several times with sleeps in between.",
   "evidence": {
    "category_B_mean": {
     "r1": 1.0,
-    "r2": 1.0
+    "r2": 1.0,
+    "r3": 1.0
    }
   }
  },

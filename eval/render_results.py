@@ -57,9 +57,11 @@ def _sentence(c: dict, lead: str) -> str:
     out = (f"{lead}, Murray's mean score difference is **{a['mean_diff']:+.3f}** over {a['n']} cases "
            f"({_n(a['wins'], 'win')}, {_n(a['losses'], 'loss')}, {_n(a['ties'], 'tie')}): **{a['sigma']} sigma** (the smaller of a paired z of "
            f"{a['z_paired']} and an exact sign test of {a['z_sign']}), 95% bootstrap interval {a['ci95'][0]:+.3f} to {a['ci95'][1]:+.3f}.")
-    if h.get("n"):
+    if h.get("n") and d.get("n"):
         out += (f" Hold-out ({h['n']} cases): {h['mean_diff']:+.3f}, {_n(h['wins'], 'win')}, {_n(h['losses'], 'loss')}. "
                 f"Cases read between rounds ({d.get('n')}): {d.get('mean_diff'):+.3f}.")
+    elif h.get("n"):
+        out += " Every case in this round is a hold-out: nothing was changed after it was first run."
     return out
 
 
@@ -102,21 +104,42 @@ def failures(path: str) -> str:
     return "\n".join(out)
 
 
+NOTES = {"r1": "as first built", "r2": "after the fixes", "r3": "36 new cases, the same system as round 2"}
+
+
+def combined(card: dict, label: str) -> str:
+    """Two rounds that ran the same system on different cases, taken together."""
+    both = card.get("combined")
+    if not both:
+        return ""
+    comp = both["comparison"]
+    means = ", ".join(f"{NAMES[s].strip('*')} {both['systems'][s]['mean_score']:.3f}" for s in ORDER if s in both["systems"])
+    parts = [f"### Rounds {both['with'][1:]} and {label[1:]} together: {both['cases']} cases, one system\n",
+             f"Mean scores over the cases each system ran: {means}.\n",
+             _sentence(comp.get("vs_best_single_model") or {}, "Against the better of the two single models on each case"),
+             _sentence(comp.get("vs_best_baseline") or {}, "Against the best of all three baselines (counting Neon handed Murray's whole log)")]
+    return "\n\n".join(p for p in parts if p) + "\n"
+
+
 def main(paths: list[str]) -> int:
     if paths and paths[0] == "--failures":
         print(failures(paths[1]))
         return 0
     rounds = [json.load(open(p)) for p in paths]
-    for i, r in enumerate(rounds):
-        note = "" if len(rounds) == 1 else (", as first built" if i == 0 else ", after the fixes" if i == len(rounds) - 1 else "")
+    for r in rounds:
+        note = NOTES.get(r["label"], "") if len(rounds) > 1 else ""
         name = f"Round {r['label'][1:]}" if r["label"][:1] == "r" and r["label"][1:].isdigit() else r["label"]
-        print(f"### {name}{note}\n")
+        print(f"### {name}{', ' + note if note else ''}\n")
         print(f"Image `{r['image_tag']}`, prompts `{r['prompt_hash']}`, test set `{r['test_set_sha256']}`, detector `{r['detector_sha256']}`.\n")
         print(headline(r["scorecard"]) + "\n")
         print(table(r["scorecard"]) + "\n")
-    if len(rounds) > 1:
-        print("### Every case where Murray's score moved between the rounds\n")
-        print(flips(rounds[0], rounds[-1]) + "\n")
+        both = r["scorecard"].get("combined")
+        if both and r["label"][1:].isdigit() and both["with"][1:].isdigit() and int(r["label"][1:]) > int(both["with"][1:]):
+            print(combined(r["scorecard"], r["label"]))          # once, under the later of the two rounds
+    for a, b in zip(rounds, rounds[1:]):
+        if {c["case_id"] for c in a["cases"]} & {c["case_id"] for c in b["cases"]}:
+            print(f"### Every case where Murray's score moved between rounds {a['label'][1:]} and {b['label'][1:]}\n")
+            print(flips(a, b) + "\n")
     return 0
 
 
