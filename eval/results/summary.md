@@ -56,9 +56,8 @@ is one model of the same family as the systems it judges, and there were no huma
 details that are in his consolidated memory but not in the excerpt. Round 1's figures are after re-scoring with the
 final scorer, which raised the baselines (see the scoring notes below). During round 1 the outcome of one hold-out
 case, not its transcript, crossed the screen in a progress line (A05, a silent escape); no fix was derived from it.
-A run that ends in a harness error is re-run once, for every system: two baseline runs in round 1, and two of
-Murray's in round 6, where the visual critic's API calls timed out while two rounds ran at once; all four then
-completed. One run of Neon alone in round 3 hit its 20-minute deadline and counts as zero for that system; its
-re-run was cut short by the final redeploy, and Hydrogen alone scored 1 on the same case, so no headline
-depends on it. Rounds 5 and 6 ran side by side, which inflates their latencies. The evaluation gives Murray up to
+A run that ends in a harness error is re-run once, for every system: two baseline runs in round 1, one in round 3
+(Neon alone had hit its 20-minute deadline), and two of Murray's in round 6, where the visual critic's API calls
+timed out while two rounds ran at once. All five then completed, and no run in any round is left in error.
+Rounds 5 and 6 ran side by side, which inflates their latencies. The evaluation gives Murray up to
 three renders and 480 seconds per turn; the public demo allows two renders and 180 seconds.

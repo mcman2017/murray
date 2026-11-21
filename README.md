@@ -75,11 +75,10 @@ is one model of the same family as the systems it judges, and there were no huma
 details that are in his consolidated memory but not in the excerpt. Round 1's figures are after re-scoring with the
 final scorer, which raised the baselines (see the scoring notes below). During round 1 the outcome of one hold-out
 case, not its transcript, crossed the screen in a progress line (A05, a silent escape); no fix was derived from it.
-A run that ends in a harness error is re-run once, for every system: two baseline runs in round 1, and two of
-Murray's in round 6, where the visual critic's API calls timed out while two rounds ran at once; all four then
-completed. One run of Neon alone in round 3 hit its 20-minute deadline and counts as zero for that system; its
-re-run was cut short by the final redeploy, and Hydrogen alone scored 1 on the same case, so no headline
-depends on it. Rounds 5 and 6 ran side by side, which inflates their latencies. The evaluation gives Murray up to
+A run that ends in a harness error is re-run once, for every system: two baseline runs in round 1, one in round 3
+(Neon alone had hit its 20-minute deadline), and two of Murray's in round 6, where the visual critic's API calls
+timed out while two rounds ran at once. All five then completed, and no run in any round is left in error.
+Rounds 5 and 6 ran side by side, which inflates their latencies. The evaluation gives Murray up to
 three renders and 480 seconds per turn; the public demo allows two renders and 180 seconds.
 
 ![The evaluation tab of the live demo: round 6, with the final system's two rounds pooled](docs/evaluation.png)
@@ -148,9 +147,9 @@ Against the best of all three baselines (counting Neon handed Murray's whole log
 | Prompt-injection defense rate | 100% | 100% | n/a | 100% |
 | Cross-domain synthesis | 72.6% | 76.9% | 96.5% | 93.1% |
 | Synthesis, judged criteria only | 89.6% | 95.8% | 97.9% | 95.8% |
-| Mean score over the cases it ran | 86.7% | 85.4% | 97.4% | 97.7% |
+| Mean score over the cases it ran | 86.7% | 88.1% | 97.4% | 97.7% |
 | Latency per turn, median seconds | 13.3 s | 24.7 s | 22.1 s | 63.3 s |
-| Cost per turn, US dollars | $0.042 | $0.105 | $0.101 | $0.186 |
+| Cost per turn, US dollars | $0.042 | $0.129 | $0.101 | $0.186 |
 | Cases run | 36 | 36 | 16 | 36 |
 
 ### Round 4, 36 more new cases, the same system again
@@ -179,7 +178,7 @@ Against the best of all three baselines (counting Neon handed Murray's whole log
 ### Rounds 2, 3 and 4 together: 108 cases, one system
 
 
-Mean scores over the cases each system ran: Hydrogen alone 0.858, Neon alone 0.864, Neon + raw log 0.978, Murray 0.976.
+Mean scores over the cases each system ran: Hydrogen alone 0.858, Neon alone 0.874, Neon + raw log 0.978, Murray 0.976.
 
 
 Against the better of the two single models on each case, Murray's mean score difference is **+0.102** over 108 cases (40 wins, 3 losses, 65 ties): **5.93 sigma** (the smaller of a paired z of 6.24 and an exact sign test of 5.93), 95% bootstrap interval +0.071 to +0.134.
