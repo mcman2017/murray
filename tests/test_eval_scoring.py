@@ -13,7 +13,7 @@ EXT2 = {c["id"]: c for c in json.loads((Path(__file__).resolve().parent.parent /
 def _later_sets():
     """Every later form of the test that is present, in order: (cases by id, how far its ids are shifted)."""
     out = [(EXT, 12), (EXT2, 24)]
-    for n, shift in ((3, 36), (4, 48), (5, 60), (6, 72), (7, 84)):
+    for n, shift in ((3, 36), (4, 48), (5, 60), (6, 72), (7, 84), (8, 96), (9, 108), (10, 120)):
         path = Path(__file__).resolve().parent.parent / "eval" / f"test_set_ext{n}.json"
         if path.is_file():
             out.append(({c["id"]: c for c in json.loads(path.read_text())["cases"]}, shift))
@@ -204,3 +204,14 @@ def test_two_headline_comparisons():
     assert comp["vs_best_single_model"]["all"]["wins"] == 1 and comp["vs_best_single_model"]["all"]["mean_diff"] == 0.1
     assert comp["vs_best_baseline"]["all"]["wins"] == 0 and comp["vs_best_baseline"]["all"]["mean_diff"] == 0.0   # the log-fed control ties C02
     assert comp["vs_baseline_neon"]["all"]["wins"] == 2
+
+
+def test_an_answer_exactly_on_the_tolerance_counts_as_right():
+    """1.3 - 1.0 is 0.30000000000000004 in binary floating point: the bound itself must still be inside."""
+    case = {"id": "A72", "category": "A", "type": "read", "expect_point": {"label": "VERTEX", "x": -3.0, "y": 1.0, "tol": 0.3}}
+    def score(line):
+        return scoring.score_case(case, "baseline_neon", {"reply": "It bottoms out there.\n" + line})["score"]
+    assert score("VERTEX: (-3.1, 1.3)") == 1.0
+    assert score("VERTEX: (-3.3, 0.7)") == 1.0
+    assert score("VERTEX: (-3, 1.31)") == 0.0
+    assert score("VERTEX: (-3, 1.5)") == 0.0
