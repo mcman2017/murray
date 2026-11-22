@@ -110,7 +110,10 @@ NOTES = {"r1": "as first built", "r2": "after the fixes", "r3": "36 new cases, t
          "r6": "36 more new cases, the final system",
          "r7": "36 new cases, the final system unchanged (planned before it ran)",
          "r8": "36 more new cases, the final system unchanged",
-         "r9": "36 more new cases, the final system unchanged"}
+         "r9": "36 more new cases, the final system unchanged",
+         "r10": "36 new cases, the final system unchanged (second plan, corrected scorer)",
+         "r11": "36 more new cases, the final system unchanged",
+         "r12": "36 more new cases, the final system unchanged"}
 
 
 def _join(nums: list[str]) -> str:

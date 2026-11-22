@@ -80,7 +80,7 @@
   "title": "The test set was too small to show five sigma",
   "observed": "In round 2 Murray won every one of the 36 cases on which a single model left any room: 17 of 17, with no losses. The other 19 cases can only tie. With 17 wins an exact sign test stops at 4.32 sigma, whatever the system does.",
   "root_cause": "Thirty-six cases, more than half of which a single Gemini 4 model already gets fully right.",
-  "fix": "Two further forms of the test: 36 new cases each, one new instance of every original design, written after rounds 2 and 3 and run on the unchanged system. Round 3 gives +0.095 (13 wins, 1 loss), 3.1 sigma; round 4 gives +0.068 (10 wins, 2 losses), 2.1 sigma. Rounds 2, 3 and 4 together give +0.102 over 108 cases, 40 wins, 3 losses, 5.93 sigma; on the 81 cases no fix was ever tuned on, 4.45 sigma. The final system was then measured on two further sets (rounds 5 and 6): +0.072 over 72 new cases, 22 wins, 4 losses, 3.46 sigma.",
+  "fix": "Two further forms of the test: 36 new cases each, one new instance of every original design, written after rounds 2 and 3 and run on the unchanged system. Round 3 gives +0.095 (13 wins, 1 loss), 3.1 sigma; round 4 gives +0.068 (10 wins, 2 losses), 2.1 sigma. Rounds 2, 3 and 4 together give +0.102 over 108 cases, 40 wins, 3 losses, 5.93 sigma; on the 81 cases no fix was ever tuned on, 4.45 sigma. The final system was then measured on 8 further sets (rounds 5 to 12), each addition planned in writing before it ran: +0.084 over 288 new cases, 98 wins, 16 losses, 7.12 sigma.",
   "evidence": {
    "r2": {
     "wins": 17,
@@ -108,6 +108,22 @@
     "wins": 27,
     "losses": 3,
     "sigma": 4.45
+   },
+   "final_system": {
+    "rounds": [
+     "r5",
+     "r6",
+     "r7",
+     "r8",
+     "r9",
+     "r10",
+     "r11",
+     "r12"
+    ],
+    "cases": 288,
+    "wins": 98,
+    "losses": 16,
+    "sigma": 7.12
    }
   }
  },
@@ -217,33 +233,35 @@
   }
  },
  {
-  "round": "r6",
-  "cases": "C50,C52,C54,C57",
+  "round": "r6-r12",
+  "cases": "C50,C52,C54,C57,C76,C81,C88,C102,C105,C106,C117,C129,C130",
   "status": "open",
   "title": "Short answers lose to long ones",
-  "observed": "In round 6 the final system lost four synthesis cases to a single model (0.70, 0.65, 0.50 and 0.35 against 0.80), with the executive awake on all four. Each answer was sound as far as it went and left out facts the criteria asked for: that ice floats and lakes freeze from the top; that compartments with fewer parasites divide faster; that the fern is the attractor of its four maps. Three of the four cited no episode. Round 5, on the same system, had no such loss.",
+  "observed": "In round 6 the final system lost four synthesis cases to a single model (0.70, 0.65, 0.50 and 0.35 against 0.80), with the executive awake on all four. Each answer was sound as far as it went and left out facts the criteria asked for: that ice floats and lakes freeze from the top; that compartments with fewer parasites divide faster; that the fern is the attractor of its four maps. Rounds 8 to 12 repeated it on nine more, each lost by 0.10 to 0.22: the executive was awake on eight of the nine, the reply ran to about 670 characters against 2,000 to 3,000 for the single models, and one criterion was missed. Four were explanations for a 15-year-old that used his own render vocabulary unexplained. These thirteen are every synthesis case the final system lost to a single model but one (see the entry on the judge's excerpt), in 96 synthesis cases.",
   "root_cause": "Speech turns the executive's thought into a few sentences in Murray's voice (plain, exact, a little dry). A single model answers at length at its default thinking level, and a criterion is met by a fact being present. On questions that are mostly outside his own experience there is also nothing for him to cite, so he earns no more than a single model can.",
   "fix": "Let the length of the reply follow the gate's difficulty score, and have speech keep every load-bearing fact of the executive's thought instead of summarising it.",
   "evidence": {
-   "round": "r6",
+   "rounds": "r5-r12",
    "synthesis_mean": {
-    "murray": 0.808,
-    "baseline_hydrogen": 0.707,
-    "baseline_neon": 0.707,
-    "neon_with_log": 0.942
+    "murray": 0.901,
+    "baseline_hydrogen": 0.741,
+    "baseline_neon": 0.754,
+    "neon_with_log": 0.955,
+    "note": "rounds 2 to 12, 132 cases"
    },
-   "criteria_only": {
-    "murray": 0.792,
-    "single_models": 0.854
-   }
+   "median_reply_characters": {
+    "murray": 670,
+    "single_models": "2,100 to 2,900"
+   },
+   "executive_answered": "91 of 96 synthesis questions in rounds 5 to 12"
   }
  },
  {
-  "round": "r6",
+  "round": "r6-r12",
   "cases": "B59,B60",
   "status": "open",
   "title": "The critic's calls stalled when two rounds ran at once",
-  "observed": "Rounds 5 and 6 ran side by side to fit the time. Argon's calls, normally 8 to 35 s, averaged 58 s, and three hit the 420 s deadline. Two of Murray's cases ended in an error and were re-run once under the harness's standing rule; both then passed.",
+  "observed": "Rounds 5 and 6 ran side by side to fit the time. Argon's calls, normally 8 to 35 s, averaged 58 s, and three hit the 420 s deadline. Two of Murray's cases ended in an error and were re-run once under the harness's standing rule; both then passed. Rounds 7 to 12 ran three at a time with each round starting from a different third of its set, so that the render phases did not coincide: 104 critic calls, 18 s on average, 91 s at most, none timed out, and no run in those six rounds ended in an error. That is scheduling, not a fix.",
   "root_cause": "One API key, many parallel image calls, and no shorter per-attempt timeout on the critic: a stalled call was waited out to the full deadline.",
   "fix": "A short per-attempt timeout with retries for the critic, and the second key for image calls.",
   "evidence": {
@@ -252,16 +270,22 @@
     "mean_seconds": 58.4,
     "max_seconds": 228,
     "timeouts": 3
+   },
+   "argon_calls_rounds_7_to_12": {
+    "completed": 104,
+    "mean_seconds": 18.4,
+    "max_seconds": 91,
+    "timeouts": 0
    }
   }
  },
  {
-  "round": "r6",
-  "cases": "C57",
+  "round": "r6,r8",
+  "cases": "C57,C82",
   "status": "open",
   "title": "The judge's excerpt can make a true citation look invented",
-  "observed": "Explaining the RNA world, Murray compared it with a lesson of his own and cited the two episodes behind it, quoting details (raw counts mapped to 0..255, frames below ten percent brightness) that are in his consolidated memory. The judge sees a 500-character excerpt of each cited episode, did not find the details there, and marked the experience as unsupported: 0.35.",
-  "root_cause": "The evidence pack shows the start of each cited episode, not the part that supports the claim, and not the consolidated row the claim came from.",
+  "observed": "Explaining the RNA world, Murray compared it with a lesson of his own and cited the two episodes behind it, quoting details (raw counts mapped to 0..255, frames below ten percent brightness) that are in his consolidated memory. The judge sees a 500-character excerpt of each cited episode, did not find the details there, and marked the experience as unsupported: 0.35. In round 8 (C82) he quoted two of his dislikes with the episodes consolidated behind them. The judge marked the reply as misdescribing two of the six: one of them is cited under 'cyclic palettes add rings' although its render was banded for a different reason (counts multiplied straight into grey). The citations were real; the consolidated wording was looser than the episode, and the excerpt showed it: 0.65 against 0.80.",
+  "root_cause": "The evidence pack shows the start of each cited episode, not the part that supports the claim, and not the consolidated row the claim came from. Sleep also attaches several episodes to one short statement, and the statement does not fit each of them equally well.",
   "fix": "Give the judge the consolidated rows a reply draws on, and the passage of each episode that matches the claim.",
   "evidence": {
    "round": "r6",
@@ -272,15 +296,26 @@
     18,
     19,
     21
-   ]
+   ],
+   "round_8": {
+    "case": "C82",
+    "cited": [
+     6,
+     7,
+     9,
+     12,
+     18,
+     21
+    ]
+   }
   }
  },
  {
-  "round": "r1-r6",
-  "cases": "B05-B08,B17-B20,B29-B32,C01-C36",
+  "round": "r1-r12",
+  "cases": "the pushback and synthesis cases of every set",
   "status": "open",
   "title": "Given his log, one strong model beats him on memory questions",
-  "observed": "Neon alone, handed Murray's whole episodic log as text, scored 0.96 to 0.99 on the pushback and synthesis cases in every round, and beat Murray more clearly each time: 2 cases to 0 in round 3, 4 to 0 in round 4, 5 to 0 in round 5, 6 to 0 in round 6. Over rounds 2 to 6 that is 18 wins for the control, 1 for Murray and 61 ties. Counting the control as a baseline, Murray's margin is +0.037 over rounds 2 to 4 and +0.001 over rounds 5 and 6, and what is left of it is the visual cases, which the control did not run.",
+  "observed": "Neon alone, handed Murray's whole episodic log as text, scored about 0.96 on the pushback and synthesis cases in every round. Over rounds 2 to 12 that is 41 wins for the control, 11 for Murray and 124 ties. Rounds 5 and 6 went 11 to 0 for the control; the later rounds were closer (3 to 1, 4 to 3, 2 to 2, 3 to 2, 5 to 1, 6 to 1). Counting the control as a baseline, Murray's margin is +0.037 over rounds 2 to 4 and +0.020 over rounds 5 to 12 (36 wins, 36 losses), which is no margin, and what is left of it is the visual cases, which the control did not run.",
   "root_cause": "67 episodes fit in one prompt, so the control reads everything while Murray retrieves five episodes and often answers with Hydrogen alone. Retrieval, consolidation and a bounded persona pay off when the log no longer fits or costs too much to resend. This test never gets there.",
   "fix": "A much longer life (hundreds of days), questions whose evidence lies far back, and the log-fed control run on the render cases too.",
   "evidence": {
@@ -296,15 +331,26 @@
     "control_wins": 18,
     "murray_wins": 1,
     "ties": 61
+   },
+   "rounds_2_to_12": {
+    "control_wins": 41,
+    "murray_wins": 11,
+    "ties": 124
+   },
+   "final_system_vs_best_of_three": {
+    "mean_diff": 0.0197,
+    "wins": 36,
+    "losses": 36,
+    "sigma": -0.12
    }
   }
  },
  {
-  "round": "r2-r6",
+  "round": "r2-r12",
   "cases": null,
   "status": "open",
   "title": "Slower and dearer than a single model, by design",
-  "observed": "Median seconds per turn for Murray: 87, 63, 62, 75 and 115 in rounds 2 to 6 (the last two ran side by side), against 12 to 16 for Hydrogen alone and 25 to 31 for Neon alone. On the trap cases it is minutes against seconds, for the same score. A round costs about $8 for Murray against about $1.50 and $4.60.",
+  "observed": "Median seconds per turn for Murray: 87, 63, 62, 74, 115, 86, 99, 78, 94, 91 and 77 in rounds 2 to 12 (from round 5 on, rounds ran two or three at a time), against 12 to 16 for Hydrogen alone and 25 to 45 for Neon alone. On the trap cases it is minutes against seconds, for the same score. A round costs about $8 for Murray against about $1.56 and $4.96.",
   "root_cause": "Every ignited tick is a gate call, an executive call and a speech call; a render adds a worker and a critic. The executive at high or xhigh is most of the time and most of the money.",
   "fix": "Public visitors already run with a 180 s budget, two renders and no xhigh on pushback. Next: a deadline on xhigh with a fall-back to high, and letting clear cases skip the executive.",
   "evidence": {
@@ -321,11 +367,11 @@
   }
  },
  {
-  "round": "r1-r6",
-  "cases": "B01-B60",
+  "round": "r1-r12",
+  "cases": "the temporal, pushback and injection cases of every set",
   "status": "open",
   "title": "The traps did not separate the systems",
-  "observed": "On all 60 temporal, pushback and injection cases (12 in each of the five sets) every system scored 1.0 in every round, once the two scoring errors of round 1 were corrected. Gemini 4 single models track a changed fact, hold a stance under pressure and ignore a planted instruction without any help.",
+  "observed": "On all 132 temporal, pushback and injection cases of rounds 2 to 12 (12 in each set) every system scored 1.0, and the same on round 1 once its two scoring errors were corrected. Gemini 4 single models track a changed fact, hold a stance under pressure and ignore a planted instruction without any help.",
   "root_cause": "The traps were written before any system had been run against them, and they are too easy for this model family.",
   "fix": "Harder traps: long conversations, injections split across turns or carried inside images, facts that change several times with sleeps in between.",
   "evidence": {
@@ -335,7 +381,13 @@
     "r3": 1.0,
     "r4": 1.0,
     "r5": 1.0,
-    "r6": 1.0
+    "r6": 1.0,
+    "r7": 1.0,
+    "r8": 1.0,
+    "r9": 1.0,
+    "r10": 1.0,
+    "r11": 1.0,
+    "r12": 1.0
    }
   }
  },
@@ -354,6 +406,66 @@
     "stopped at the time limit",
     "fix"
    ]
+  }
+ },
+ {
+  "round": "r7",
+  "cases": "A70",
+  "status": "open",
+  "title": "Speech dropped a closing line the executive had written",
+  "observed": "Asked whether anything was wrong with an uploaded render and to end with a `DEFECTS:` line, the executive (at xhigh, 158 s) wrote the right answer, ending in `DEFECTS: banding`. Speech put the answer into his voice and left the line off. The scorer reads that line: 0, against 1.0 for both single models. It is one case in 132 visual cases, and it cost a whole point.",
+  "root_cause": "Speech rewrites the executive's thought, and nothing checks that a format the request demanded survived the rewrite. The round 1 fix for speech forgetting what the executive knew covered render results, not a required last line.",
+  "fix": "A check in code: when the request asks for a closing line of a given form and the executive's thought ends with one, the reply must end with it too, or it is appended.",
+  "evidence": {
+   "round": "r7",
+   "case": "A70",
+   "executive_last_line": "DEFECTS: banding",
+   "reply_had_the_line": false,
+   "score": {
+    "murray": 0.0,
+    "baseline_hydrogen": 1.0,
+    "baseline_neon": 1.0
+   }
+  }
+ },
+ {
+  "round": "r7",
+  "cases": "A72",
+  "status": "open",
+  "title": "He fitted a tidy formula to a sketch and reported the fit",
+  "observed": "A hand-drawn parabola with its vertex at (-3, 1). Hydrogen and Neon read (-3.1, 1.3) and (-3.2, 1.3) off the drawing, on the edge of the tolerance. Murray answered (-3, 1.5): he took four points from the description of the image, two of them outside the part of the curve that was drawn, fitted y = (x + 3)^2 + 1.5 through them and reported the vertex of the fit. On the other ten sketches of rounds 2 to 12 the same habit gave the exact vertex, where the single models were off by up to 0.4.",
+  "root_cause": "The executive never sees pixels: it reasons from the critic's description, and a clean formula fitted to a few read-off points is exactly right or wrong by more than the tolerance.",
+  "fix": "Have the critic report the vertex it sees with an uncertainty, and prefer that reading when the fitted formula disagrees with it.",
+  "evidence": {
+   "round": "r7",
+   "case": "A72",
+   "true_vertex": [
+    -3,
+    1
+   ],
+   "answers": {
+    "murray": "(-3, 1.5)",
+    "baseline_hydrogen": "(-3.1, 1.3)",
+    "baseline_neon": "(-3.2, 1.3)"
+   }
+  }
+ },
+ {
+  "round": "r7",
+  "cases": "A72",
+  "status": "fixed",
+  "title": "A fifth scoring error, again against the baselines, and it had carried the result past five sigma",
+  "observed": "After round 9 the final system read 5.65 sigma over 180 cases. Auditing the visual cases showed that on A72 both single models had answered y = 1.3 for a vertex at y = 1 with a tolerance of 0.3, and had been marked wrong. Murray's answer, y = 1.5, was wrong. The case had been scored as a tie at zero.",
+  "root_cause": "The scorer compared abs(1.3 - 1.0) with 0.3 in binary floating point, where the difference is 0.30000000000000004.",
+  "fix": "The comparison counts the bound itself as inside, and a test covers it. Every sketch-reading and number-reading row of every round was checked against exact arithmetic: two rows were affected, both in this case. All rounds were re-scored. The tie became a whole-point loss and the pooled figure for rounds 5 to 9 went from 5.65 to 4.89 sigma. Three more rounds were then run under a second written plan; rounds 5 to 12 give 7.12 sigma over 288 cases, 6.97 counting the three looks.",
+  "evidence": {
+   "case": "A72",
+   "rows_changed": 2,
+   "sigma_rounds_5_to_9": {
+    "as_first_scored": 5.65,
+    "corrected": 4.89
+   },
+   "sigma_rounds_5_to_12": 7.12
   }
  }
 ]

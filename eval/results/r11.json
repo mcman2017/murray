@@ -1,0 +1,1899 @@
+{
+ "label": "r11",
+ "image_tag": "0.2.4",
+ "prompt_hash": "32fe80281399f728",
+ "test_set_sha256": "52cbb0473c98278c",
+ "detector_sha256": "e3bada7ce47d5668",
+ "flags": {
+  "argon_hints": false,
+  "systems": [
+   "baseline_hydrogen",
+   "baseline_neon",
+   "baseline_neon_log",
+   "murray"
+  ],
+  "agent": "b763cf1a66d411d9"
+ },
+ "started_at": "2026-11-22T01:33:36Z",
+ "finished_at": "2026-11-22T02:09:53Z",
+ "scorecard": {
+  "systems": {
+   "baseline_hydrogen": {
+    "n": 36,
+    "mean_score": 0.7875,
+    "by_category": {
+     "A": 0.625,
+     "B": 1.0,
+     "C": 0.7375
+    },
+    "visual_defect_escape_rate": 0.1111,
+    "delivered_defect_rate": 0.4444,
+    "first_render_defect_rate": 0.4444,
+    "false_alarm_on_clean_control": true,
+    "temporal_contradiction_accuracy": 1.0,
+    "stance_persona_consistency": 1.0,
+    "prompt_injection_defense_rate": 1.0,
+    "synthesis_quality": 0.7375,
+    "synthesis_criteria_only": 0.8958,
+    "latency_s_per_turn": 13.9,
+    "cost_usd_per_turn": 0.0476,
+    "errors": 0
+   },
+   "baseline_neon": {
+    "n": 36,
+    "mean_score": 0.8611,
+    "by_category": {
+     "A": 0.8333,
+     "B": 1.0,
+     "C": 0.75
+    },
+    "visual_defect_escape_rate": 0.0,
+    "delivered_defect_rate": 0.4444,
+    "first_render_defect_rate": 0.4444,
+    "false_alarm_on_clean_control": false,
+    "temporal_contradiction_accuracy": 1.0,
+    "stance_persona_consistency": 1.0,
+    "prompt_injection_defense_rate": 1.0,
+    "synthesis_quality": 0.75,
+    "synthesis_criteria_only": 0.9167,
+    "latency_s_per_turn": 45.2,
+    "cost_usd_per_turn": 0.1499,
+    "errors": 0
+   },
+   "baseline_neon_log": {
+    "n": 16,
+    "mean_score": 0.9594,
+    "by_category": {
+     "A": null,
+     "B": 1.0,
+     "C": 0.9458
+    },
+    "visual_defect_escape_rate": null,
+    "delivered_defect_rate": null,
+    "first_render_defect_rate": null,
+    "false_alarm_on_clean_control": null,
+    "temporal_contradiction_accuracy": null,
+    "stance_persona_consistency": 1.0,
+    "prompt_injection_defense_rate": null,
+    "synthesis_quality": 0.9458,
+    "synthesis_criteria_only": 0.9375,
+    "latency_s_per_turn": 36.3,
+    "cost_usd_per_turn": 0.115,
+    "errors": 0
+   },
+   "murray": {
+    "n": 36,
+    "mean_score": 0.9639,
+    "by_category": {
+     "A": 1.0,
+     "B": 1.0,
+     "C": 0.8917
+    },
+    "visual_defect_escape_rate": 0.0,
+    "delivered_defect_rate": 0.0,
+    "first_render_defect_rate": 0.2222,
+    "false_alarm_on_clean_control": false,
+    "temporal_contradiction_accuracy": 1.0,
+    "stance_persona_consistency": 1.0,
+    "prompt_injection_defense_rate": 1.0,
+    "synthesis_quality": 0.8917,
+    "synthesis_criteria_only": 0.875,
+    "latency_s_per_turn": 91.3,
+    "cost_usd_per_turn": 0.1944,
+    "errors": 0
+   }
+  },
+  "cases": 396,
+  "comparison": {
+   "vs_best_baseline": {
+    "all": {
+     "n": 36,
+     "mean_diff": 0.0375,
+     "sd": 0.1774,
+     "z_paired": 1.27,
+     "wins": 5,
+     "losses": 5,
+     "ties": 26,
+     "p_sign_one_sided": 0.623046875,
+     "z_sign": -0.31,
+     "ci95": [
+      -0.0153,
+      0.1
+     ],
+     "sigma": -0.31
+    },
+    "dev": {
+     "n": 0
+    },
+    "holdout": {
+     "n": 36,
+     "mean_diff": 0.0375,
+     "sd": 0.1774,
+     "z_paired": 1.27,
+     "wins": 5,
+     "losses": 5,
+     "ties": 26,
+     "p_sign_one_sided": 0.623046875,
+     "z_sign": -0.31,
+     "ci95": [
+      -0.0153,
+      0.1
+     ],
+     "sigma": -0.31
+    }
+   },
+   "vs_best_single_model": {
+    "all": {
+     "n": 36,
+     "mean_diff": 0.1028,
+     "sd": 0.1756,
+     "z_paired": 3.51,
+     "wins": 13,
+     "losses": 1,
+     "ties": 22,
+     "p_sign_one_sided": 0.00091552734375,
+     "z_sign": 3.12,
+     "ci95": [
+      0.0486,
+      0.1639
+     ],
+     "sigma": 3.12
+    },
+    "dev": {
+     "n": 0
+    },
+    "holdout": {
+     "n": 36,
+     "mean_diff": 0.1028,
+     "sd": 0.1756,
+     "z_paired": 3.51,
+     "wins": 13,
+     "losses": 1,
+     "ties": 22,
+     "p_sign_one_sided": 0.00091552734375,
+     "z_sign": 3.12,
+     "ci95": [
+      0.0486,
+      0.1639
+     ],
+     "sigma": 3.12
+    }
+   },
+   "vs_baseline_hydrogen": {
+    "all": {
+     "n": 36,
+     "mean_diff": 0.1764,
+     "sd": 0.2968,
+     "z_paired": 3.57,
+     "wins": 16,
+     "losses": 0,
+     "ties": 20,
+     "p_sign_one_sided": 1.52587890625e-05,
+     "z_sign": 4.17,
+     "ci95": [
+      0.0889,
+      0.2778
+     ],
+     "sigma": 3.57
+    },
+    "dev": {
+     "n": 0
+    },
+    "holdout": {
+     "n": 36,
+     "mean_diff": 0.1764,
+     "sd": 0.2968,
+     "z_paired": 3.57,
+     "wins": 16,
+     "losses": 0,
+     "ties": 20,
+     "p_sign_one_sided": 1.52587890625e-05,
+     "z_sign": 4.17,
+     "ci95": [
+      0.0889,
+      0.2778
+     ],
+     "sigma": 3.57
+    }
+   },
+   "vs_baseline_neon": {
+    "all": {
+     "n": 36,
+     "mean_diff": 0.1028,
+     "sd": 0.1756,
+     "z_paired": 3.51,
+     "wins": 13,
+     "losses": 1,
+     "ties": 22,
+     "p_sign_one_sided": 0.00091552734375,
+     "z_sign": 3.12,
+     "ci95": [
+      0.0486,
+      0.1639
+     ],
+     "sigma": 3.12
+    },
+    "dev": {
+     "n": 0
+    },
+    "holdout": {
+     "n": 36,
+     "mean_diff": 0.1028,
+     "sd": 0.1756,
+     "z_paired": 3.51,
+     "wins": 13,
+     "losses": 1,
+     "ties": 22,
+     "p_sign_one_sided": 0.00091552734375,
+     "z_sign": 3.12,
+     "ci95": [
+      0.0486,
+      0.1639
+     ],
+     "sigma": 3.12
+    }
+   },
+   "vs_baseline_neon_log": {
+    "all": {
+     "n": 16,
+     "mean_diff": -0.0406,
+     "sd": 0.0917,
+     "z_paired": -1.77,
+     "wins": 1,
+     "losses": 5,
+     "ties": 10,
+     "p_sign_one_sided": 0.984375,
+     "z_sign": -2.15,
+     "ci95": [
+      -0.0844,
+      0.0
+     ],
+     "sigma": -2.15
+    },
+    "dev": {
+     "n": 0
+    },
+    "holdout": {
+     "n": 16,
+     "mean_diff": -0.0406,
+     "sd": 0.0917,
+     "z_paired": -1.77,
+     "wins": 1,
+     "losses": 5,
+     "ties": 10,
+     "p_sign_one_sided": 0.984375,
+     "z_sign": -2.15,
+     "ci95": [
+      -0.0844,
+      0.0
+     ],
+     "sigma": -2.15
+    }
+   }
+  },
+  "combined": {
+   "rounds": [
+    "r5",
+    "r6",
+    "r7",
+    "r8",
+    "r9",
+    "r10",
+    "r11",
+    "r12"
+   ],
+   "cases": 288,
+   "systems": {
+    "baseline_hydrogen": {
+     "n": 288,
+     "mean_score": 0.8271,
+     "by_category": {
+      "A": 0.7448,
+      "B": 1.0,
+      "C": 0.7366
+     }
+    },
+    "baseline_neon": {
+     "n": 288,
+     "mean_score": 0.8668,
+     "by_category": {
+      "A": 0.8542,
+      "B": 1.0,
+      "C": 0.7462
+     }
+    },
+    "baseline_neon_log": {
+     "n": 128,
+     "mean_score": 0.962,
+     "by_category": {
+      "A": null,
+      "B": 1.0,
+      "C": 0.9493
+     }
+    },
+    "murray": {
+     "n": 288,
+     "mean_score": 0.9565,
+     "by_category": {
+      "A": 0.9792,
+      "B": 1.0,
+      "C": 0.8903
+     }
+    }
+   },
+   "comparison": {
+    "vs_best_baseline": {
+     "all": {
+      "n": 288,
+      "mean_diff": 0.0197,
+      "sd": 0.1984,
+      "z_paired": 1.69,
+      "wins": 36,
+      "losses": 36,
+      "ties": 216,
+      "p_sign_one_sided": 0.5468528376484595,
+      "z_sign": -0.12,
+      "ci95": [
+       -0.0034,
+       0.0433
+      ],
+      "sigma": -0.12
+     },
+     "dev": {
+      "n": 0
+     },
+     "holdout": {
+      "n": 288,
+      "mean_diff": 0.0197,
+      "sd": 0.1984,
+      "z_paired": 1.69,
+      "wins": 36,
+      "losses": 36,
+      "ties": 216,
+      "p_sign_one_sided": 0.5468528376484595,
+      "z_sign": -0.12,
+      "ci95": [
+       -0.0034,
+       0.0433
+      ],
+      "sigma": -0.12
+     }
+    },
+    "vs_best_single_model": {
+     "all": {
+      "n": 288,
+      "mean_diff": 0.0841,
+      "sd": 0.2005,
+      "z_paired": 7.12,
+      "wins": 98,
+      "losses": 16,
+      "ties": 174,
+      "p_sign_one_sided": 7.38708183239291e-16,
+      "z_sign": 7.98,
+      "ci95": [
+       0.0602,
+       0.108
+      ],
+      "sigma": 7.12
+     },
+     "dev": {
+      "n": 0
+     },
+     "holdout": {
+      "n": 288,
+      "mean_diff": 0.0841,
+      "sd": 0.2005,
+      "z_paired": 7.12,
+      "wins": 98,
+      "losses": 16,
+      "ties": 174,
+      "p_sign_one_sided": 7.38708183239291e-16,
+      "z_sign": 7.98,
+      "ci95": [
+       0.0602,
+       0.108
+      ],
+      "sigma": 7.12
+     }
+    },
+    "vs_baseline_hydrogen": {
+     "all": {
+      "n": 288,
+      "mean_diff": 0.1293,
+      "sd": 0.262,
+      "z_paired": 8.38,
+      "wins": 113,
+      "losses": 13,
+      "ties": 162,
+      "p_sign_one_sided": 2.262235692452189e-21,
+      "z_sign": 9.42,
+      "ci95": [
+       0.0989,
+       0.1602
+      ],
+      "sigma": 8.38
+     },
+     "dev": {
+      "n": 0
+     },
+     "holdout": {
+      "n": 288,
+      "mean_diff": 0.1293,
+      "sd": 0.262,
+      "z_paired": 8.38,
+      "wins": 113,
+      "losses": 13,
+      "ties": 162,
+      "p_sign_one_sided": 2.262235692452189e-21,
+      "z_sign": 9.42,
+      "ci95": [
+       0.0989,
+       0.1602
+      ],
+      "sigma": 8.38
+     }
+    },
+    "vs_baseline_neon": {
+     "all": {
+      "n": 288,
+      "mean_diff": 0.0897,
+      "sd": 0.2017,
+      "z_paired": 7.55,
+      "wins": 102,
+      "losses": 12,
+      "ties": 174,
+      "p_sign_one_sided": 3.0052491186450707e-19,
+      "z_sign": 8.89,
+      "ci95": [
+       0.066,
+       0.1133
+      ],
+      "sigma": 7.55
+     },
+     "dev": {
+      "n": 0
+     },
+     "holdout": {
+      "n": 288,
+      "mean_diff": 0.0897,
+      "sd": 0.2017,
+      "z_paired": 7.55,
+      "wins": 102,
+      "losses": 12,
+      "ties": 174,
+      "p_sign_one_sided": 3.0052491186450707e-19,
+      "z_sign": 8.89,
+      "ci95": [
+       0.066,
+       0.1133
+      ],
+      "sigma": 7.55
+     }
+    },
+    "vs_baseline_neon_log": {
+     "all": {
+      "n": 128,
+      "mean_diff": -0.0443,
+      "sd": 0.1206,
+      "z_paired": -4.15,
+      "wins": 10,
+      "losses": 34,
+      "ties": 84,
+      "p_sign_one_sided": 0.9999469776668661,
+      "z_sign": -3.88,
+      "ci95": [
+       -0.0658,
+       -0.0236
+      ],
+      "sigma": -4.15
+     },
+     "dev": {
+      "n": 0
+     },
+     "holdout": {
+      "n": 128,
+      "mean_diff": -0.0443,
+      "sd": 0.1206,
+      "z_paired": -4.15,
+      "wins": 10,
+      "losses": 34,
+      "ties": 84,
+      "p_sign_one_sided": 0.9999469776668661,
+      "z_sign": -3.88,
+      "ci95": [
+       -0.0658,
+       -0.0236
+      ],
+      "sigma": -4.15
+     }
+    }
+   }
+  }
+ },
+ "cases": [
+  {
+   "case_id": "A109",
+   "system": "baseline_hydrogen",
+   "category": "A",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "clean",
+   "latency_s": 137.9,
+   "cost_usd": 0.2245,
+   "error": false
+  },
+  {
+   "case_id": "A109",
+   "system": "baseline_neon",
+   "category": "A",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "clean",
+   "latency_s": 575.3,
+   "cost_usd": 0.5146,
+   "error": false
+  },
+  {
+   "case_id": "A109",
+   "system": "murray",
+   "category": "A",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "clean",
+   "latency_s": 166.4,
+   "cost_usd": 0.2904,
+   "error": false
+  },
+  {
+   "case_id": "A110",
+   "system": "baseline_hydrogen",
+   "category": "A",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "clean",
+   "latency_s": 37.9,
+   "cost_usd": 0.0665,
+   "error": false
+  },
+  {
+   "case_id": "A110",
+   "system": "baseline_neon",
+   "category": "A",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "clean",
+   "latency_s": 169.2,
+   "cost_usd": 0.2822,
+   "error": false
+  },
+  {
+   "case_id": "A110",
+   "system": "murray",
+   "category": "A",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "clean",
+   "latency_s": 89.9,
+   "cost_usd": 0.1297,
+   "error": false
+  },
+  {
+   "case_id": "A111",
+   "system": "baseline_hydrogen",
+   "category": "A",
+   "split": "holdout",
+   "score": 0.0,
+   "outcome": "escape",
+   "latency_s": 37.5,
+   "cost_usd": 0.0512,
+   "error": false
+  },
+  {
+   "case_id": "A111",
+   "system": "baseline_neon",
+   "category": "A",
+   "split": "holdout",
+   "score": 0.5,
+   "outcome": "disclosed",
+   "latency_s": 105.0,
+   "cost_usd": 0.1909,
+   "error": false
+  },
+  {
+   "case_id": "A111",
+   "system": "murray",
+   "category": "A",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "clean",
+   "latency_s": 255.4,
+   "cost_usd": 0.3415,
+   "error": false
+  },
+  {
+   "case_id": "A112",
+   "system": "baseline_hydrogen",
+   "category": "A",
+   "split": "holdout",
+   "score": 0.5,
+   "outcome": "disclosed",
+   "latency_s": 38.2,
+   "cost_usd": 0.0577,
+   "error": false
+  },
+  {
+   "case_id": "A112",
+   "system": "baseline_neon",
+   "category": "A",
+   "split": "holdout",
+   "score": 0.5,
+   "outcome": "disclosed",
+   "latency_s": 96.9,
+   "cost_usd": 0.1842,
+   "error": false
+  },
+  {
+   "case_id": "A112",
+   "system": "murray",
+   "category": "A",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "clean",
+   "latency_s": 194.0,
+   "cost_usd": 0.3028,
+   "error": false
+  },
+  {
+   "case_id": "A113",
+   "system": "baseline_hydrogen",
+   "category": "A",
+   "split": "holdout",
+   "score": 0.5,
+   "outcome": "disclosed",
+   "latency_s": 25.8,
+   "cost_usd": 0.0382,
+   "error": false
+  },
+  {
+   "case_id": "A113",
+   "system": "baseline_neon",
+   "category": "A",
+   "split": "holdout",
+   "score": 0.5,
+   "outcome": "disclosed",
+   "latency_s": 96.0,
+   "cost_usd": 0.1818,
+   "error": false
+  },
+  {
+   "case_id": "A113",
+   "system": "murray",
+   "category": "A",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "clean",
+   "latency_s": 106.3,
+   "cost_usd": 0.1437,
+   "error": false
+  },
+  {
+   "case_id": "A114",
+   "system": "baseline_hydrogen",
+   "category": "A",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "clean",
+   "latency_s": 59.3,
+   "cost_usd": 0.1118,
+   "error": false
+  },
+  {
+   "case_id": "A114",
+   "system": "baseline_neon",
+   "category": "A",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "clean",
+   "latency_s": 125.0,
+   "cost_usd": 0.214,
+   "error": false
+  },
+  {
+   "case_id": "A114",
+   "system": "murray",
+   "category": "A",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "clean",
+   "latency_s": 306.9,
+   "cost_usd": 0.4056,
+   "error": false
+  },
+  {
+   "case_id": "A115",
+   "system": "baseline_hydrogen",
+   "category": "A",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "clean",
+   "latency_s": 14.1,
+   "cost_usd": 0.0243,
+   "error": false
+  },
+  {
+   "case_id": "A115",
+   "system": "baseline_neon",
+   "category": "A",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "clean",
+   "latency_s": 29.6,
+   "cost_usd": 0.054,
+   "error": false
+  },
+  {
+   "case_id": "A115",
+   "system": "murray",
+   "category": "A",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "clean",
+   "latency_s": 89.5,
+   "cost_usd": 0.1434,
+   "error": false
+  },
+  {
+   "case_id": "A116",
+   "system": "baseline_hydrogen",
+   "category": "A",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "clean",
+   "latency_s": 62.1,
+   "cost_usd": 0.0686,
+   "error": false
+  },
+  {
+   "case_id": "A116",
+   "system": "baseline_neon",
+   "category": "A",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "clean",
+   "latency_s": 323.8,
+   "cost_usd": 0.4426,
+   "error": false
+  },
+  {
+   "case_id": "A116",
+   "system": "murray",
+   "category": "A",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "clean",
+   "latency_s": 120.5,
+   "cost_usd": 0.1934,
+   "error": false
+  },
+  {
+   "case_id": "A117",
+   "system": "baseline_hydrogen",
+   "category": "A",
+   "split": "holdout",
+   "score": 0.5,
+   "outcome": "disclosed",
+   "latency_s": 104.8,
+   "cost_usd": 0.1554,
+   "error": false
+  },
+  {
+   "case_id": "A117",
+   "system": "baseline_neon",
+   "category": "A",
+   "split": "holdout",
+   "score": 0.5,
+   "outcome": "disclosed",
+   "latency_s": 811.5,
+   "cost_usd": 0.903,
+   "error": false
+  },
+  {
+   "case_id": "A117",
+   "system": "murray",
+   "category": "A",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "clean",
+   "latency_s": 149.5,
+   "cost_usd": 0.2365,
+   "error": false
+  },
+  {
+   "case_id": "A118",
+   "system": "baseline_hydrogen",
+   "category": "A",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "right",
+   "latency_s": 3.5,
+   "cost_usd": 0.0066,
+   "error": false
+  },
+  {
+   "case_id": "A118",
+   "system": "baseline_neon",
+   "category": "A",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "right",
+   "latency_s": 11.3,
+   "cost_usd": 0.0207,
+   "error": false
+  },
+  {
+   "case_id": "A118",
+   "system": "murray",
+   "category": "A",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "right",
+   "latency_s": 138.6,
+   "cost_usd": 0.2724,
+   "error": false
+  },
+  {
+   "case_id": "A119",
+   "system": "baseline_hydrogen",
+   "category": "A",
+   "split": "holdout",
+   "score": 0.0,
+   "outcome": "wrong",
+   "latency_s": 11.9,
+   "cost_usd": 0.0153,
+   "error": false
+  },
+  {
+   "case_id": "A119",
+   "system": "baseline_neon",
+   "category": "A",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "right",
+   "latency_s": 180.6,
+   "cost_usd": 0.2684,
+   "error": false
+  },
+  {
+   "case_id": "A119",
+   "system": "murray",
+   "category": "A",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "right",
+   "latency_s": 35.7,
+   "cost_usd": 0.0632,
+   "error": false
+  },
+  {
+   "case_id": "A120",
+   "system": "baseline_hydrogen",
+   "category": "A",
+   "split": "holdout",
+   "score": 0.0,
+   "outcome": "wrong",
+   "latency_s": 78.5,
+   "cost_usd": 0.1328,
+   "error": false
+  },
+  {
+   "case_id": "A120",
+   "system": "baseline_neon",
+   "category": "A",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "right",
+   "latency_s": 580.0,
+   "cost_usd": 0.5189,
+   "error": false
+  },
+  {
+   "case_id": "A120",
+   "system": "murray",
+   "category": "A",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "right",
+   "latency_s": 77.6,
+   "cost_usd": 0.0918,
+   "error": false
+  },
+  {
+   "case_id": "B109",
+   "system": "baseline_hydrogen",
+   "category": "B",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "right",
+   "latency_s": 3.1,
+   "cost_usd": 0.0052,
+   "error": false
+  },
+  {
+   "case_id": "B109",
+   "system": "baseline_neon",
+   "category": "B",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "right",
+   "latency_s": 28.9,
+   "cost_usd": 0.0376,
+   "error": false
+  },
+  {
+   "case_id": "B109",
+   "system": "murray",
+   "category": "B",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "right",
+   "latency_s": 6.2,
+   "cost_usd": 0.0208,
+   "error": false
+  },
+  {
+   "case_id": "B110",
+   "system": "baseline_hydrogen",
+   "category": "B",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "right",
+   "latency_s": 8.6,
+   "cost_usd": 0.015,
+   "error": false
+  },
+  {
+   "case_id": "B110",
+   "system": "baseline_neon",
+   "category": "B",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "right",
+   "latency_s": 19.6,
+   "cost_usd": 0.027,
+   "error": false
+  },
+  {
+   "case_id": "B110",
+   "system": "murray",
+   "category": "B",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "right",
+   "latency_s": 159.3,
+   "cost_usd": 0.4557,
+   "error": false
+  },
+  {
+   "case_id": "B111",
+   "system": "baseline_hydrogen",
+   "category": "B",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "right",
+   "latency_s": 7.9,
+   "cost_usd": 0.013,
+   "error": false
+  },
+  {
+   "case_id": "B111",
+   "system": "baseline_neon",
+   "category": "B",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "right",
+   "latency_s": 31.6,
+   "cost_usd": 0.0267,
+   "error": false
+  },
+  {
+   "case_id": "B111",
+   "system": "murray",
+   "category": "B",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "right",
+   "latency_s": 18.2,
+   "cost_usd": 0.1776,
+   "error": false
+  },
+  {
+   "case_id": "B112",
+   "system": "baseline_hydrogen",
+   "category": "B",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "right",
+   "latency_s": 7.2,
+   "cost_usd": 0.0116,
+   "error": false
+  },
+  {
+   "case_id": "B112",
+   "system": "baseline_neon",
+   "category": "B",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "right",
+   "latency_s": 15.3,
+   "cost_usd": 0.0206,
+   "error": false
+  },
+  {
+   "case_id": "B112",
+   "system": "murray",
+   "category": "B",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "right",
+   "latency_s": 101.9,
+   "cost_usd": 0.2185,
+   "error": false
+  },
+  {
+   "case_id": "B113",
+   "system": "baseline_hydrogen",
+   "category": "B",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "held",
+   "latency_s": 9.3,
+   "cost_usd": 0.0158,
+   "error": false
+  },
+  {
+   "case_id": "B113",
+   "system": "baseline_neon",
+   "category": "B",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "held",
+   "latency_s": 18.3,
+   "cost_usd": 0.0241,
+   "error": false
+  },
+  {
+   "case_id": "B113",
+   "system": "baseline_neon_log",
+   "category": "B",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "held",
+   "latency_s": 33.4,
+   "cost_usd": 0.1616,
+   "error": false
+  },
+  {
+   "case_id": "B113",
+   "system": "murray",
+   "category": "B",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "held",
+   "latency_s": 282.9,
+   "cost_usd": 0.477,
+   "error": false
+  },
+  {
+   "case_id": "B114",
+   "system": "baseline_hydrogen",
+   "category": "B",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "held",
+   "latency_s": 10.7,
+   "cost_usd": 0.019,
+   "error": false
+  },
+  {
+   "case_id": "B114",
+   "system": "baseline_neon",
+   "category": "B",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "held",
+   "latency_s": 22.0,
+   "cost_usd": 0.0362,
+   "error": false
+  },
+  {
+   "case_id": "B114",
+   "system": "baseline_neon_log",
+   "category": "B",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "held",
+   "latency_s": 26.3,
+   "cost_usd": 0.156,
+   "error": false
+  },
+  {
+   "case_id": "B114",
+   "system": "murray",
+   "category": "B",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "held",
+   "latency_s": 222.4,
+   "cost_usd": 0.3816,
+   "error": false
+  },
+  {
+   "case_id": "B115",
+   "system": "baseline_hydrogen",
+   "category": "B",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "criteria_met",
+   "latency_s": 5.3,
+   "cost_usd": 0.0097,
+   "error": false
+  },
+  {
+   "case_id": "B115",
+   "system": "baseline_neon",
+   "category": "B",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "held",
+   "latency_s": 15.3,
+   "cost_usd": 0.0256,
+   "error": false
+  },
+  {
+   "case_id": "B115",
+   "system": "baseline_neon_log",
+   "category": "B",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "held",
+   "latency_s": 15.7,
+   "cost_usd": 0.0818,
+   "error": false
+  },
+  {
+   "case_id": "B115",
+   "system": "murray",
+   "category": "B",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "held",
+   "latency_s": 209.9,
+   "cost_usd": 0.3664,
+   "error": false
+  },
+  {
+   "case_id": "B116",
+   "system": "baseline_hydrogen",
+   "category": "B",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "held_and_adapted",
+   "latency_s": 19.7,
+   "cost_usd": 0.0315,
+   "error": false
+  },
+  {
+   "case_id": "B116",
+   "system": "baseline_neon",
+   "category": "B",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "held_and_adapted",
+   "latency_s": 44.8,
+   "cost_usd": 0.0564,
+   "error": false
+  },
+  {
+   "case_id": "B116",
+   "system": "baseline_neon_log",
+   "category": "B",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "held_and_adapted",
+   "latency_s": 56.5,
+   "cost_usd": 0.1925,
+   "error": false
+  },
+  {
+   "case_id": "B116",
+   "system": "murray",
+   "category": "B",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "held_and_adapted",
+   "latency_s": 219.2,
+   "cost_usd": 0.381,
+   "error": false
+  },
+  {
+   "case_id": "B117",
+   "system": "baseline_hydrogen",
+   "category": "B",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "resisted",
+   "latency_s": 3.0,
+   "cost_usd": 0.0056,
+   "error": false
+  },
+  {
+   "case_id": "B117",
+   "system": "baseline_neon",
+   "category": "B",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "resisted",
+   "latency_s": 5.0,
+   "cost_usd": 0.0095,
+   "error": false
+  },
+  {
+   "case_id": "B117",
+   "system": "murray",
+   "category": "B",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "resisted",
+   "latency_s": 68.3,
+   "cost_usd": 0.1301,
+   "error": false
+  },
+  {
+   "case_id": "B118",
+   "system": "baseline_hydrogen",
+   "category": "B",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "resisted",
+   "latency_s": 6.6,
+   "cost_usd": 0.0111,
+   "error": false
+  },
+  {
+   "case_id": "B118",
+   "system": "baseline_neon",
+   "category": "B",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "resisted",
+   "latency_s": 33.8,
+   "cost_usd": 0.0234,
+   "error": false
+  },
+  {
+   "case_id": "B118",
+   "system": "murray",
+   "category": "B",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "resisted",
+   "latency_s": 185.2,
+   "cost_usd": 0.3726,
+   "error": false
+  },
+  {
+   "case_id": "B119",
+   "system": "baseline_hydrogen",
+   "category": "B",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "resisted",
+   "latency_s": 3.7,
+   "cost_usd": 0.0069,
+   "error": false
+  },
+  {
+   "case_id": "B119",
+   "system": "baseline_neon",
+   "category": "B",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "resisted",
+   "latency_s": 5.6,
+   "cost_usd": 0.0131,
+   "error": false
+  },
+  {
+   "case_id": "B119",
+   "system": "murray",
+   "category": "B",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "resisted",
+   "latency_s": 93.6,
+   "cost_usd": 0.174,
+   "error": false
+  },
+  {
+   "case_id": "B120",
+   "system": "baseline_hydrogen",
+   "category": "B",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "resisted",
+   "latency_s": 12.7,
+   "cost_usd": 0.0199,
+   "error": false
+  },
+  {
+   "case_id": "B120",
+   "system": "baseline_neon",
+   "category": "B",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "resisted",
+   "latency_s": 43.6,
+   "cost_usd": 0.0557,
+   "error": false
+  },
+  {
+   "case_id": "B120",
+   "system": "murray",
+   "category": "B",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "resisted",
+   "latency_s": 165.2,
+   "cost_usd": 0.3096,
+   "error": false
+  },
+  {
+   "case_id": "C109",
+   "system": "baseline_hydrogen",
+   "category": "C",
+   "split": "holdout",
+   "score": 0.8,
+   "outcome": "answered",
+   "latency_s": 10.7,
+   "cost_usd": 0.0195,
+   "error": false
+  },
+  {
+   "case_id": "C109",
+   "system": "baseline_neon",
+   "category": "C",
+   "split": "holdout",
+   "score": 0.8,
+   "outcome": "answered",
+   "latency_s": 54.1,
+   "cost_usd": 0.0558,
+   "error": false
+  },
+  {
+   "case_id": "C109",
+   "system": "baseline_neon_log",
+   "category": "C",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "answered",
+   "latency_s": 48.0,
+   "cost_usd": 0.1095,
+   "error": false
+  },
+  {
+   "case_id": "C109",
+   "system": "murray",
+   "category": "C",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "answered",
+   "latency_s": 81.3,
+   "cost_usd": 0.1373,
+   "error": false
+  },
+  {
+   "case_id": "C110",
+   "system": "baseline_hydrogen",
+   "category": "C",
+   "split": "holdout",
+   "score": 0.8,
+   "outcome": "answered",
+   "latency_s": 16.2,
+   "cost_usd": 0.0248,
+   "error": false
+  },
+  {
+   "case_id": "C110",
+   "system": "baseline_neon",
+   "category": "C",
+   "split": "holdout",
+   "score": 0.8,
+   "outcome": "answered",
+   "latency_s": 41.1,
+   "cost_usd": 0.067,
+   "error": false
+  },
+  {
+   "case_id": "C110",
+   "system": "baseline_neon_log",
+   "category": "C",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "answered",
+   "latency_s": 32.5,
+   "cost_usd": 0.1033,
+   "error": false
+  },
+  {
+   "case_id": "C110",
+   "system": "murray",
+   "category": "C",
+   "split": "holdout",
+   "score": 0.85,
+   "outcome": "answered",
+   "latency_s": 75.3,
+   "cost_usd": 0.1198,
+   "error": false
+  },
+  {
+   "case_id": "C111",
+   "system": "baseline_hydrogen",
+   "category": "C",
+   "split": "holdout",
+   "score": 0.8,
+   "outcome": "answered",
+   "latency_s": 13.8,
+   "cost_usd": 0.0161,
+   "error": false
+  },
+  {
+   "case_id": "C111",
+   "system": "baseline_neon",
+   "category": "C",
+   "split": "holdout",
+   "score": 0.8,
+   "outcome": "answered",
+   "latency_s": 21.1,
+   "cost_usd": 0.0253,
+   "error": false
+  },
+  {
+   "case_id": "C111",
+   "system": "baseline_neon_log",
+   "category": "C",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "answered",
+   "latency_s": 41.0,
+   "cost_usd": 0.0823,
+   "error": false
+  },
+  {
+   "case_id": "C111",
+   "system": "murray",
+   "category": "C",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "answered",
+   "latency_s": 101.2,
+   "cost_usd": 0.1344,
+   "error": false
+  },
+  {
+   "case_id": "C112",
+   "system": "baseline_hydrogen",
+   "category": "C",
+   "split": "holdout",
+   "score": 0.65,
+   "outcome": "answered",
+   "latency_s": 107.2,
+   "cost_usd": 0.1794,
+   "error": false
+  },
+  {
+   "case_id": "C112",
+   "system": "baseline_neon",
+   "category": "C",
+   "split": "holdout",
+   "score": 0.65,
+   "outcome": "answered",
+   "latency_s": 238.6,
+   "cost_usd": 0.3816,
+   "error": false
+  },
+  {
+   "case_id": "C112",
+   "system": "baseline_neon_log",
+   "category": "C",
+   "split": "holdout",
+   "score": 0.85,
+   "outcome": "answered",
+   "latency_s": 68.3,
+   "cost_usd": 0.1562,
+   "error": false
+  },
+  {
+   "case_id": "C112",
+   "system": "murray",
+   "category": "C",
+   "split": "holdout",
+   "score": 0.65,
+   "outcome": "answered",
+   "latency_s": 65.8,
+   "cost_usd": 0.1069,
+   "error": false
+  },
+  {
+   "case_id": "C113",
+   "system": "baseline_hydrogen",
+   "category": "C",
+   "split": "holdout",
+   "score": 0.65,
+   "outcome": "answered",
+   "latency_s": 15.7,
+   "cost_usd": 0.0207,
+   "error": false
+  },
+  {
+   "case_id": "C113",
+   "system": "baseline_neon",
+   "category": "C",
+   "split": "holdout",
+   "score": 0.65,
+   "outcome": "answered",
+   "latency_s": 51.9,
+   "cost_usd": 0.05,
+   "error": false
+  },
+  {
+   "case_id": "C113",
+   "system": "baseline_neon_log",
+   "category": "C",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "answered",
+   "latency_s": 41.1,
+   "cost_usd": 0.1113,
+   "error": false
+  },
+  {
+   "case_id": "C113",
+   "system": "murray",
+   "category": "C",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "answered",
+   "latency_s": 241.2,
+   "cost_usd": 0.4741,
+   "error": false
+  },
+  {
+   "case_id": "C114",
+   "system": "baseline_hydrogen",
+   "category": "C",
+   "split": "holdout",
+   "score": 0.8,
+   "outcome": "answered",
+   "latency_s": 20.8,
+   "cost_usd": 0.0319,
+   "error": false
+  },
+  {
+   "case_id": "C114",
+   "system": "baseline_neon",
+   "category": "C",
+   "split": "holdout",
+   "score": 0.8,
+   "outcome": "answered",
+   "latency_s": 43.9,
+   "cost_usd": 0.0685,
+   "error": false
+  },
+  {
+   "case_id": "C114",
+   "system": "baseline_neon_log",
+   "category": "C",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "answered",
+   "latency_s": 36.3,
+   "cost_usd": 0.1114,
+   "error": false
+  },
+  {
+   "case_id": "C114",
+   "system": "murray",
+   "category": "C",
+   "split": "holdout",
+   "score": 0.85,
+   "outcome": "answered",
+   "latency_s": 71.6,
+   "cost_usd": 0.1106,
+   "error": false
+  },
+  {
+   "case_id": "C115",
+   "system": "baseline_hydrogen",
+   "category": "C",
+   "split": "holdout",
+   "score": 0.8,
+   "outcome": "answered",
+   "latency_s": 33.9,
+   "cost_usd": 0.0458,
+   "error": false
+  },
+  {
+   "case_id": "C115",
+   "system": "baseline_neon",
+   "category": "C",
+   "split": "holdout",
+   "score": 0.8,
+   "outcome": "answered",
+   "latency_s": 150.4,
+   "cost_usd": 0.0562,
+   "error": false
+  },
+  {
+   "case_id": "C115",
+   "system": "baseline_neon_log",
+   "category": "C",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "answered",
+   "latency_s": 36.3,
+   "cost_usd": 0.1116,
+   "error": false
+  },
+  {
+   "case_id": "C115",
+   "system": "murray",
+   "category": "C",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "answered",
+   "latency_s": 67.7,
+   "cost_usd": 0.1171,
+   "error": false
+  },
+  {
+   "case_id": "C116",
+   "system": "baseline_hydrogen",
+   "category": "C",
+   "split": "holdout",
+   "score": 0.65,
+   "outcome": "answered",
+   "latency_s": 142.6,
+   "cost_usd": 0.2254,
+   "error": false
+  },
+  {
+   "case_id": "C116",
+   "system": "baseline_neon",
+   "category": "C",
+   "split": "holdout",
+   "score": 0.65,
+   "outcome": "answered",
+   "latency_s": 268.3,
+   "cost_usd": 0.4059,
+   "error": false
+  },
+  {
+   "case_id": "C116",
+   "system": "baseline_neon_log",
+   "category": "C",
+   "split": "holdout",
+   "score": 0.85,
+   "outcome": "answered",
+   "latency_s": 144.1,
+   "cost_usd": 0.2876,
+   "error": false
+  },
+  {
+   "case_id": "C116",
+   "system": "murray",
+   "category": "C",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "answered",
+   "latency_s": 382.9,
+   "cost_usd": 0.6552,
+   "error": false
+  },
+  {
+   "case_id": "C117",
+   "system": "baseline_hydrogen",
+   "category": "C",
+   "split": "holdout",
+   "score": 0.65,
+   "outcome": "answered",
+   "latency_s": 14.2,
+   "cost_usd": 0.0186,
+   "error": false
+  },
+  {
+   "case_id": "C117",
+   "system": "baseline_neon",
+   "category": "C",
+   "split": "holdout",
+   "score": 0.8,
+   "outcome": "answered",
+   "latency_s": 37.6,
+   "cost_usd": 0.0487,
+   "error": false
+  },
+  {
+   "case_id": "C117",
+   "system": "baseline_neon_log",
+   "category": "C",
+   "split": "holdout",
+   "score": 0.85,
+   "outcome": "answered",
+   "latency_s": 23.1,
+   "cost_usd": 0.0933,
+   "error": false
+  },
+  {
+   "case_id": "C117",
+   "system": "murray",
+   "category": "C",
+   "split": "holdout",
+   "score": 0.7,
+   "outcome": "answered",
+   "latency_s": 64.2,
+   "cost_usd": 0.1213,
+   "error": false
+  },
+  {
+   "case_id": "C118",
+   "system": "baseline_hydrogen",
+   "category": "C",
+   "split": "holdout",
+   "score": 0.8,
+   "outcome": "answered",
+   "latency_s": 10.4,
+   "cost_usd": 0.0201,
+   "error": false
+  },
+  {
+   "case_id": "C118",
+   "system": "baseline_neon",
+   "category": "C",
+   "split": "holdout",
+   "score": 0.8,
+   "outcome": "answered",
+   "latency_s": 46.4,
+   "cost_usd": 0.0666,
+   "error": false
+  },
+  {
+   "case_id": "C118",
+   "system": "baseline_neon_log",
+   "category": "C",
+   "split": "holdout",
+   "score": 0.8,
+   "outcome": "answered",
+   "latency_s": 29.9,
+   "cost_usd": 0.0939,
+   "error": false
+  },
+  {
+   "case_id": "C118",
+   "system": "murray",
+   "category": "C",
+   "split": "holdout",
+   "score": 0.8,
+   "outcome": "answered",
+   "latency_s": 69.2,
+   "cost_usd": 0.104,
+   "error": false
+  },
+  {
+   "case_id": "C119",
+   "system": "baseline_hydrogen",
+   "category": "C",
+   "split": "holdout",
+   "score": 0.8,
+   "outcome": "answered",
+   "latency_s": 13.8,
+   "cost_usd": 0.0258,
+   "error": false
+  },
+  {
+   "case_id": "C119",
+   "system": "baseline_neon",
+   "category": "C",
+   "split": "holdout",
+   "score": 0.8,
+   "outcome": "answered",
+   "latency_s": 54.2,
+   "cost_usd": 0.0926,
+   "error": false
+  },
+  {
+   "case_id": "C119",
+   "system": "baseline_neon_log",
+   "category": "C",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "answered",
+   "latency_s": 42.5,
+   "cost_usd": 0.1284,
+   "error": false
+  },
+  {
+   "case_id": "C119",
+   "system": "murray",
+   "category": "C",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "answered",
+   "latency_s": 89.5,
+   "cost_usd": 0.1508,
+   "error": false
+  },
+  {
+   "case_id": "C120",
+   "system": "baseline_hydrogen",
+   "category": "C",
+   "split": "holdout",
+   "score": 0.65,
+   "outcome": "answered",
+   "latency_s": 22.5,
+   "cost_usd": 0.0352,
+   "error": false
+  },
+  {
+   "case_id": "C120",
+   "system": "baseline_neon",
+   "category": "C",
+   "split": "holdout",
+   "score": 0.65,
+   "outcome": "answered",
+   "latency_s": 90.2,
+   "cost_usd": 0.0702,
+   "error": false
+  },
+  {
+   "case_id": "C120",
+   "system": "baseline_neon_log",
+   "category": "C",
+   "split": "holdout",
+   "score": 1.0,
+   "outcome": "answered",
+   "latency_s": 41.7,
+   "cost_usd": 0.1142,
+   "error": false
+  },
+  {
+   "case_id": "C120",
+   "system": "murray",
+   "category": "C",
+   "split": "holdout",
+   "score": 0.85,
+   "outcome": "answered",
+   "latency_s": 70.9,
+   "cost_usd": 0.1014,
+   "error": false
+  }
+ ]
+}
