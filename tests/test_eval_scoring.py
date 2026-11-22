@@ -13,7 +13,7 @@ EXT2 = {c["id"]: c for c in json.loads((Path(__file__).resolve().parent.parent /
 def _later_sets():
     """Every later form of the test that is present, in order: (cases by id, how far its ids are shifted)."""
     out = [(EXT, 12), (EXT2, 24)]
-    for n, shift in ((3, 36), (4, 48)):
+    for n, shift in ((3, 36), (4, 48), (5, 60), (6, 72), (7, 84)):
         path = Path(__file__).resolve().parent.parent / "eval" / f"test_set_ext{n}.json"
         if path.is_file():
             out.append(({c["id"]: c for c in json.loads(path.read_text())["cases"]}, shift))
