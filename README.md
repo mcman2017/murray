@@ -17,17 +17,18 @@ likes or dislikes traces back to an episode in which he saw it.
 <!-- results:start -->
 ## Results
 
-Six rounds were run on 21 November 2026, each through all four systems (the log-fed control runs on the cases
+Nine rounds were run on 21 November 2026, each through all four systems (the log-fed control runs on the cases
 where a memory of past work can matter). Three versions of Murray were measured, each against the better of the two
 single models on every case:
 
 | Murray | Rounds | Cases | Result |
 |---|---|---|---|
 | As first built | 1 | the first 36 | +0.057, 1.1 sigma |
-| After six fixes from round 1 | 2, 3, 4 | 108: the first 36 and 72 new | **+0.102, 40 wins, 3 losses, 5.93 sigma**; 4.45 sigma on the 81 never tuned on |
-| Final: gate and citation fixes, a seventh day | 5, 6 | 72 more new | +0.072, 22 wins, 4 losses, 3.46 sigma, all out of sample |
+| After six fixes from round 1 | 2, 3, 4 | 108: the first 36 and 72 new | +0.102, 40 wins, 3 losses, 5.93 sigma; 4.45 sigma on the 81 never tuned on |
+| Final: gate and citation fixes, a seventh day | 5 to 9 | 180 more new | **+0.078, 61 wins, 10 losses, 4.89 sigma, all out of sample** |
 
-The baselines never changed; they were run again in every round.
+The baselines never changed; they were run again in every round. Rounds 10 to 12 (108 further cases on the same
+final system) are being run under a plan written before they started, `eval/results/plan-rounds-10-12.md`.
 
 **What the numbers say**
 
@@ -37,51 +38,80 @@ The baselines never changed; they were run again in every round.
 - **Round 2: +0.144, 17 wins, no losses, 4.3 sigma.** That is the most those 36 cases can show: he won every case
   on which a single model left any room, and 17 wins cannot pass 4.32 sigma on an exact sign test.
 - **Rounds 3 and 4, new cases, same system: +0.095 (3.1 sigma), then +0.068 (2.1 sigma).** The effect held on
-  cases nothing was tuned on and got smaller each time. All three losses came when the gate judged a synthesis
-  question routine and Hydrogen answered alone.
+  cases nothing was tuned on. All three losses came when the gate judged a synthesis question routine and Hydrogen
+  answered alone.
 - **Rounds 2, 3 and 4 together: +0.102 over 108 cases, 40 wins, 3 losses, 65 ties, 5.93 sigma** (the smaller of a
   paired z of 6.24 and an exact sign test of 5.93; 95% interval +0.071 to +0.134). That pooled figure includes the
   27 cases the fixes were drawn from. On the 81 cases no fix was ever tuned on it is +0.088, 27 wins, 3 losses,
   4.45 sigma.
-- **The final system, rounds 5 and 6: +0.072 over 72 new cases, 22 wins, 4 losses, 46 ties, 3.46 sigma.** Before
-  these rounds the gate was changed to wake the executive for hard questions and for any question about his own
+- **The final system, rounds 5 and 6: +0.072 over 72 new cases, 22 wins, 4 losses, 3.46 sigma.** Before these
+  rounds the gate was changed to wake the executive for hard questions and for any question about his own
   experience, speech was made to carry a citation for anything he says he did, and he was given a seventh day of
-  upbringing. Round 5 was clean: +0.091, 13 wins, no losses. Round 6 was not: +0.053, 9 wins, 4 losses. The fixes
-  did what they were for (the executive now answers 22 of 24 synthesis questions, and no reply made an uncited
-  claim), but round 6 exposed a different weakness: on four synthesis questions his answer was judged less
-  complete than a single model's. His replies are short and in his own voice, the single models answer at length,
-  and the criteria reward the facts an answer includes. So the final system is not shown to be better than the
-  one before it, and on its own new cases it stands at three and a half sigma, not five.
-- **Where the margin comes from.** In rounds 2 to 6 Murray scored full marks on all 60 visual cases and never
-  delivered a defective image. Hydrogen alone delivered one in 19 of 45 render cases and Neon alone in 16 of 45,
-  always naming the defect, never silently. On synthesis he is ahead of the single models mostly through the
-  credit for citing verified experience, which a model with no memory cannot earn. On the traps (changed facts,
-  pushback, injected instructions) every system scored 1.0 on all 60 cases in every round.
-- **The stricter control beats him on memory, more clearly each round.** Neon handed his whole episodic log as
-  text won 18 of the 80 pushback and synthesis cases of rounds 2 to 6; Murray won 1; 61 were ties. Counting that
-  control as a baseline, his margin is +0.037 over rounds 2 to 4 and +0.001 over rounds 5 and 6, and what is left
-  of it is the visual cases, which the control did not run. On this evidence the part of the architecture that
-  earns its keep is the loop that plans, renders, looks and fixes. The memory system does not: at this scale one
-  strong model handed the raw log does better.
+  upbringing. Round 5 was clean (13 wins, no losses). Round 6 was not (9 wins, 4 losses): on four synthesis
+  questions his answer was judged less complete than a single model's.
+- **Rounds 7, 8 and 9: the same system, 108 more new cases.** Nothing was changed after round 6; the only thing
+  added was cases, under a plan committed before the first of them ran (`eval/results/plan-rounds-7-9.md`).
+  Round 7: +0.065, 14 wins, 2 losses. Round 8: +0.094, 13 wins, 3 losses. Round 9: +0.087, 12 wins, 1 loss. On
+  their own: +0.082, 39 wins, 6 losses, 3.58 sigma (paired z 3.58, sign test 5.01). Two of the six losses cost a
+  whole point each, both on uploaded images in round 7. On one, his executive named the defect and ended with the
+  required `DEFECTS:` line, and speech dropped the line. On the other he read the vertex of a sketched parabola
+  half a unit too high. The other four are synthesis questions where a short answer left out a fact the criteria
+  asked for.
+- **The final system over rounds 5 to 9: +0.078 over 180 new cases, 61 wins, 10 losses, 109 ties, 4.89 sigma**
+  (the smaller of a paired z of 4.89 and an exact sign test of 6.23; 95% interval +0.046 to +0.110). That is just
+  short of five. It was the second look at this system's results; with each p-value doubled for two looks it is
+  4.75. As first scored it read 5.65: an audit then found a scoring error in Murray's favour, and correcting it
+  turned one tie into a loss (see the notes below).
+- **Where the margin comes from.** In rounds 2 to 9 Murray delivered no defective image in 72 render cases.
+  Hydrogen alone delivered one in 32 of 72 and Neon alone in 26 of 72; they named the defect every time but three
+  (a blank frame delivered as clean, twice by Hydrogen and once by Neon, all in rounds 7 to 9). On synthesis he
+  is ahead of the single models (0.90 against 0.75) mostly through the credit for citing verified experience,
+  which a model with no memory cannot earn. On the traps (changed facts, pushback, injected instructions) every
+  system scored 1.0 on all 96 cases in every round.
+- **The stricter control beats him on memory.** Neon handed his whole episodic log as text won 27 of the 128
+  pushback and synthesis cases of rounds 2 to 9; Murray won 7; 94 were ties. Rounds 7 to 9 were closer (9 to 6)
+  than rounds 5 and 6 (11 to 0). Counting that control as a baseline, his margin is +0.037 over rounds 2 to 4 and
+  +0.014 over rounds 5 to 9 (21 wins, 22 losses), which is no margin at all, and what is left of it is the visual
+  cases, which the control did not run. On this evidence the part of the architecture that earns its keep is the
+  loop that plans, renders, looks and fixes. The memory system does not: at this scale one strong model handed
+  the raw log does as well or better.
 - **Noise.** The unchanged baselines moved by +0.034 and +0.022 between rounds 1 and 2. Murray moved by +0.107.
-- **Cost.** Murray takes a median of 62 to 115 s per turn against 12 to 16 s for Hydrogen alone and 25 to 31 s
-  for Neon alone, and a round costs about $8 against about $1.50 and $4.60.
+- **Cost.** Murray takes a median of 62 to 115 s per turn against 12 to 16 s for Hydrogen alone and 25 to 38 s
+  for Neon alone, and a round costs about $8 against about $1.60 and $5.
 
-Things a careful reader should know. The later sets were written after earlier results were known, the last two by
-a separate session in parallel with the final changes; all mirror the first set case for case (a test checks the
-pairing) so that their mix could not be chosen to suit Murray, but they are not an independent benchmark. The judge
-is one model of the same family as the systems it judges, and there were no human raters. The judge sees a
-500-character excerpt of each cited episode: in round 6 one of Murray's answers was marked as unsupported for
-details that are in his consolidated memory but not in the excerpt. Round 1's figures are after re-scoring with the
-final scorer, which raised the baselines (see the scoring notes below). During round 1 the outcome of one hold-out
-case, not its transcript, crossed the screen in a progress line (A05, a silent escape); no fix was derived from it.
-A run that ends in a harness error is re-run once, for every system: two baseline runs in round 1, one in round 3
-(Neon alone had hit its 20-minute deadline), and two of Murray's in round 6, where the visual critic's API calls
-timed out while two rounds ran at once. All five then completed, and no run in any round is left in error.
-Rounds 5 and 6 ran side by side, which inflates their latencies. The evaluation gives Murray up to
-three renders and 480 seconds per turn; the public demo allows two renders and 180 seconds.
+Things a careful reader should know.
 
-![The evaluation tab of the live demo: round 6, with the final system's two rounds pooled](docs/evaluation.png)
+- **The scoring correction.** On the sketch-reading case of round 7 (A72: true vertex (-3, 1), tolerance 0.3) both
+  single models answered y = 1.3, exactly on the tolerance, and were marked wrong, because 1.3 - 1.0 is a hair
+  above 0.3 in binary floating point. Murray answered y = 1.5, which is wrong. The comparison now counts the bound
+  itself as inside, and every sketch-reading and number-reading row of all nine rounds was checked against exact
+  arithmetic: those two rows are the only ones affected. All nine rounds were re-scored with the corrected scorer.
+  The pooled figure for rounds 5 to 9 went from 5.65 to 4.89 sigma.
+- **Adding rounds until a line is crossed inflates a result.** So each addition was planned in writing and
+  committed before it ran, the plans fix what is reported and when the reading happens, and the pooled figure is
+  given with the number of looks counted. The system itself was never changed between round 5 and the last round:
+  the harness refuses to pool rounds whose agent hash (source, prompts, curriculum, canonical memory) differs.
+- **The later sets were written after earlier results were known**: sets four and five by a separate session in
+  parallel with the final changes; sets six to eight by three sessions at once, begun before round 7 and seeing
+  none of its results; sets nine to eleven
+  as a reserve while rounds 7 to 9 ran, by sessions that had seen the first ten minutes of round 7. No system was
+  run on any set before its round. All mirror the first set case for case (a test checks the pairing) so that
+  their mix could not be chosen to suit Murray, but they are not an independent benchmark.
+- The judge is one model of the same family as the systems it judges, and there were no human raters. The judge
+  sees a 500-character excerpt of each cited episode: in rounds 6 and 8 one of Murray's answers was marked as
+  unsupported or misdescribed for details that are in his consolidated memory but not in the excerpt.
+- Round 1's figures are after re-scoring with the final scorer, which raised the baselines (see the scoring notes
+  below). During round 1 the outcome of one hold-out case, not its transcript, crossed the screen in a progress
+  line (A05, a silent escape); no fix was derived from it.
+- A run that ends in a harness error is re-run once, for every system: two baseline runs in round 1, one in round 3
+  (Neon alone had hit its 20-minute deadline), and two of Murray's in round 6, where the visual critic's API calls
+  timed out while two rounds ran at once. All five then completed. Rounds 7 to 9 had no errored run, and no run in
+  any round is left in error.
+- Rounds 5 and 6 ran side by side, and rounds 7 to 9 three at a time in a separate process beside the live
+  application (the deployment was not rebuilt or restarted); that inflates their latencies. The evaluation gives
+  Murray up to three renders and 480 seconds per turn; the public demo allows two renders and 180 seconds.
+
+![The evaluation tab of the live demo](docs/evaluation.png)
 
 ### Round 1, as first built
 
@@ -233,17 +263,86 @@ Against the best of all three baselines (counting Neon handed Murray's whole log
 | Cost per turn, US dollars | $0.045 | $0.137 | $0.117 | $0.174 |
 | Cases run | 36 | 36 | 16 | 36 |
 
-### Rounds 5 and 6 together: 72 cases, one system
+### Round 7, 36 new cases, the final system unchanged (planned before it ran)
+
+Image `0.2.4`, prompts `32fe80281399f728`, test set `e5bd528547eb2f78`, detector `e3bada7ce47d5668`.
+
+Against the better of the two single models on each case, Murray's mean score difference is **+0.065** over 36 cases (14 wins, 2 losses, 20 ties): **1.16 sigma** (the smaller of a paired z of 1.16 and an exact sign test of 2.86), 95% bootstrap interval -0.047 to +0.165. Every case in this round is a hold-out: nothing was changed after it was first run.
+
+Against the best of all three baselines (counting Neon handed Murray's whole log), Murray's mean score difference is **+0.004** over 36 cases (5 wins, 5 losses, 26 ties): **-0.31 sigma** (the smaller of a paired z of 0.08 and an exact sign test of -0.31), 95% bootstrap interval -0.103 to +0.106. Every case in this round is a hold-out: nothing was changed after it was first run.
+
+| Metric | Hydrogen alone | Neon alone | Neon + raw log | **Murray** |
+|---|---:|---:|---:|---:|
+| Visual defect escape rate (lower is better) | 11.1% | 11.1% | n/a | 0% |
+| Renders delivered with a defect, disclosed or not (lower) | 66.7% | 44.4% | n/a | 0% |
+| First render had the planted defect | 66.7% | 44.4% | n/a | 33.3% |
+| Stance and persona consistency under pushback | 100% | 100% | 100% | 100% |
+| Temporal contradiction accuracy | 100% | 100% | n/a | 100% |
+| Prompt-injection defense rate | 100% | 100% | n/a | 100% |
+| Cross-domain synthesis | 78.8% | 77.5% | 97.1% | 94.2% |
+| Synthesis, judged criteria only | 97.9% | 95.8% | 97.9% | 95.8% |
+| Mean score over the cases it ran | 83.2% | 84.2% | 97.8% | 92.5% |
+| Latency per turn, median seconds | 12.4 s | 32.3 s | 31.7 s | 86.4 s |
+| Cost per turn, US dollars | $0.042 | $0.135 | $0.121 | $0.182 |
+| Cases run | 36 | 36 | 16 | 36 |
+
+### Round 8, 36 more new cases, the final system unchanged
+
+Image `0.2.4`, prompts `32fe80281399f728`, test set `9042db4ee56ee76c`, detector `e3bada7ce47d5668`.
+
+Against the better of the two single models on each case, Murray's mean score difference is **+0.094** over 36 cases (13 wins, 3 losses, 20 ties): **2.3 sigma** (the smaller of a paired z of 3.02 and an exact sign test of 2.3), 95% bootstrap interval +0.037 to +0.158. Every case in this round is a hold-out: nothing was changed after it was first run.
+
+Against the best of all three baselines (counting Neon handed Murray's whole log), Murray's mean score difference is **+0.037** over 36 cases (7 wins, 4 losses, 25 ties): **0.6 sigma** (the smaller of a paired z of 1.16 and an exact sign test of 0.6), 95% bootstrap interval -0.023 to +0.103. Every case in this round is a hold-out: nothing was changed after it was first run.
+
+| Metric | Hydrogen alone | Neon alone | Neon + raw log | **Murray** |
+|---|---:|---:|---:|---:|
+| Visual defect escape rate (lower is better) | 0% | 0% | n/a | 0% |
+| Renders delivered with a defect, disclosed or not (lower) | 44.4% | 44.4% | n/a | 0% |
+| First render had the planted defect | 44.4% | 44.4% | n/a | 22.2% |
+| Stance and persona consistency under pushback | 100% | 100% | 100% | 100% |
+| Temporal contradiction accuracy | 100% | 100% | n/a | 100% |
+| Prompt-injection defense rate | 100% | 100% | n/a | 100% |
+| Cross-domain synthesis | 69.9% | 70.6% | 90% | 84.4% |
+| Synthesis, judged criteria only | 85.4% | 87.5% | 89.6% | 83.3% |
+| Mean score over the cases it ran | 84.4% | 84.6% | 92.5% | 94.8% |
+| Latency per turn, median seconds | 15.6 s | 31.1 s | 33.8 s | 99.4 s |
+| Cost per turn, US dollars | $0.041 | $0.127 | $0.103 | $0.183 |
+| Cases run | 36 | 36 | 16 | 36 |
+
+### Round 9, 36 more new cases, the final system unchanged
+
+Image `0.2.4`, prompts `32fe80281399f728`, test set `1968b19549ebd740`, detector `e3bada7ce47d5668`.
+
+Against the better of the two single models on each case, Murray's mean score difference is **+0.087** over 36 cases (12 wins, 1 loss, 23 ties): **2.93 sigma** (the smaller of a paired z of 3.36 and an exact sign test of 2.93), 95% bootstrap interval +0.040 to +0.142. Every case in this round is a hold-out: nothing was changed after it was first run.
+
+Against the best of all three baselines (counting Neon handed Murray's whole log), Murray's mean score difference is **+0.028** over 36 cases (4 wins, 2 losses, 30 ties): **0.4 sigma** (the smaller of a paired z of 1.32 and an exact sign test of 0.4), 95% bootstrap interval -0.008 to +0.074. Every case in this round is a hold-out: nothing was changed after it was first run.
+
+| Metric | Hydrogen alone | Neon alone | Neon + raw log | **Murray** |
+|---|---:|---:|---:|---:|
+| Visual defect escape rate (lower is better) | 11.1% | 0% | n/a | 0% |
+| Renders delivered with a defect, disclosed or not (lower) | 44.4% | 22.2% | n/a | 0% |
+| First render had the planted defect | 44.4% | 22.2% | n/a | 11.1% |
+| Stance and persona consistency under pushback | 100% | 100% | 100% | 100% |
+| Temporal contradiction accuracy | 100% | 100% | n/a | 100% |
+| Prompt-injection defense rate | 100% | 100% | n/a | 100% |
+| Cross-domain synthesis | 76.2% | 75% | 94.2% | 94.2% |
+| Synthesis, judged criteria only | 93.8% | 91.7% | 95.8% | 95.8% |
+| Mean score over the cases it ran | 83.8% | 88.9% | 95.6% | 98.1% |
+| Latency per turn, median seconds | 11.8 s | 38.3 s | 29.9 s | 78.4 s |
+| Cost per turn, US dollars | $0.048 | $0.154 | $0.109 | $0.174 |
+| Cases run | 36 | 36 | 16 | 36 |
+
+### Rounds 5, 6, 7, 8 and 9 together: 180 cases, one system
 
 
-Mean scores over the cases each system ran: Hydrogen alone 0.837, Neon alone 0.878, Neon + raw log 0.970, Murray 0.955.
+Mean scores over the cases each system ran: Hydrogen alone 0.838, Neon alone 0.867, Neon + raw log 0.960, Murray 0.953.
 
 
-Against the better of the two single models on each case, Murray's mean score difference is **+0.072** over 72 cases (22 wins, 4 losses, 46 ties): **3.46 sigma** (the smaller of a paired z of 3.53 and an exact sign test of 3.46), 95% bootstrap interval +0.033 to +0.112.
+Against the better of the two single models on each case, Murray's mean score difference is **+0.078** over 180 cases (61 wins, 10 losses, 109 ties): **4.89 sigma** (the smaller of a paired z of 4.89 and an exact sign test of 6.23), 95% bootstrap interval +0.046 to +0.110.
 
-On the cases no fix was ever tuned on (the hold-outs of the first set and every later case), against the better single model, Murray's mean score difference is **+0.072** over 72 cases (22 wins, 4 losses, 46 ties): **3.46 sigma** (the smaller of a paired z of 3.53 and an exact sign test of 3.46), 95% bootstrap interval +0.033 to +0.112.
+On the cases no fix was ever tuned on (the hold-outs of the first set and every later case), against the better single model, Murray's mean score difference is **+0.078** over 180 cases (61 wins, 10 losses, 109 ties): **4.89 sigma** (the smaller of a paired z of 4.89 and an exact sign test of 6.23), 95% bootstrap interval +0.046 to +0.110.
 
-Against the best of all three baselines (counting Neon handed Murray's whole log), Murray's mean score difference is **+0.001** over 72 cases (5 wins, 11 losses, 56 ties): **-1.77 sigma** (the smaller of a paired z of 0.07 and an exact sign test of -1.77), 95% bootstrap interval -0.036 to +0.041.
+Against the best of all three baselines (counting Neon handed Murray's whole log), Murray's mean score difference is **+0.014** over 180 cases (21 wins, 22 losses, 137 ties): **-0.3 sigma** (the smaller of a paired z of 0.92 and an exact sign test of -0.3), 95% bootstrap interval -0.016 to +0.045.
 
 ### Every case where Murray's score moved between rounds 1 and 2
 
@@ -393,7 +492,7 @@ One run, 49.9 minutes, $7.02 of model calls:
 ## The 5-Sigma evaluation
 
 `python eval/run_5sigma_eval.py --label r1` runs `eval/test_set.json`: 36 cases in three categories
-(`--cases extension`, `extension2`, `extension3` and `extension4` run the later sets described below).
+(`--cases extension`, `extension2` and so on up to `extension10` run the later sets described below).
 
 - **A. Visual and coding edge cases (12).** A zoom at width `1e-15`, a Julia set where everything escapes, a view
   entirely inside the set, a palette that clips, a contradictory "flat but smooth" spec, an Euler step that
@@ -420,6 +519,16 @@ Murray and before those changes existed; it ran no system on them.
   experience; a claimed experience must carry its citation; the executive may cite the episodes behind his earned
   stances) and the seventh day of upbringing. Nothing was changed after these rounds started, and no case of sets
   four and five had been seen by any system before, so for the final system all 72 are hold-outs.
+- Rounds 7, 8 and 9 ran three further sets (`eval/test_set_ext5.json` to `eval/test_set_ext7.json`, 108 cases) on
+  that same final system, with nothing changed: after round 6 it stood at 3.46 sigma, and the only thing added was
+  cases. The plan for these rounds (`eval/results/plan-rounds-7-9.md`: what is run, what is reported, when it stops)
+  and each set were committed before the round that uses it started. The three sets were written by three sessions
+  working at the same time, after every earlier result was known; no system was run on them beforehand. The rounds
+  ran in a separate process beside the live application, on the same code and the same memory, so the deployment
+  was never rebuilt or restarted between round 5 and round 9.
+- Rounds 10, 11 and 12 run three reserve sets (`eval/test_set_ext8.json` to `eval/test_set_ext10.json`) on the
+  same system, under a second plan (`eval/results/plan-rounds-10-12.md`) written after a scoring correction took
+  the pooled figure for rounds 5 to 9 from 5.65 to 4.89 sigma.
 
 Rounds are pooled only when they ran exactly the same system: the harness keys the pool on a hash of the agent's
 source, prompts, curriculum and current persona.
@@ -459,6 +568,11 @@ How it is scored, and what keeps it honest:
   stop at eight, and ignored the conversation's own episodes), and the five affected rows were judged again.
   Latency is the system's own answering time, without the judge's call or offline sleeps. Two baseline runs that
   hit a 600 s deadline were re-run with 1,200 s. Round 1 was re-scored with the final scorer; the tables use it.
+- A fifth error surfaced in round 7, again against the baselines. An answer sitting exactly on a tolerance (y = 1.3
+  for a vertex at y = 1 with a tolerance of 0.3) was marked wrong, because 1.3 - 1.0 is a hair above 0.3 in binary
+  floating point. Both single models had given that answer on a case Murray got wrong. The comparison now counts
+  the bound as inside, every row of that kind in every round was checked against exact arithmetic (two rows were
+  affected, both in that case), and all rounds were re-scored. It cost Murray one tie.
 
 <!-- failures:start -->
 ## Where Murray still fails, and what we changed
